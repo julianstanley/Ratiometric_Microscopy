@@ -26,7 +26,7 @@ Assume that $R_Red = 0.667$ and $R_Ox = 5.207$. Vary $\delta$ by factors of 2.
 
 ```{r}
 require(RColorBrewer)
-colors <- brewer.pal(n = 16, 'Dark2')
+colors <- brewer.pal(n = 8, 'Dark2')
 
 maxRed <- 0.667
 maxOx <- 5.207
@@ -42,7 +42,7 @@ yOx = FOx(x, rep(maxRed, each = magX),
 par(mar=c(5, 5, 5, 8), pty = 's', bg = NA)   
 plot(x, yOx,
         type = 'l', main = "
-     Fraction of molecules oxidized at intensity",
+     Fraction of molecules oxidized at intensity \n with variable delta",
         ylab = expression('OxD'['roGFP']), xlab = expression('R'['410/470']),
      col = colors[1])
 
@@ -57,14 +57,53 @@ for (i in 2:length(delta_values)) {
 }
 
 options(digits = 4)
-legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:6])
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
 
-dev.copy(pdf,'plot1.pdf', compress = FALSE)
+dev.copy(pdf,'plot1_1.pdf', compress = FALSE)
+```
+
+## Vary minimal intensity
+```{r}
+maxRed_values <- c(0, .667, 1, 1.5, 2.0, 3.0, 4.0, 5.0)
+maxOx <- 5.207
+delta <- 0.171
+
+x <- seq(maxRed_values[1], maxOx, by = 0.001)
+magX <- length(x)
+
+yOx = FOx(x, rep(maxRed_values[1], each = magX), 
+        rep(maxOx, each = magX), 
+        rep(delta, each = magX))
+     
+par(mar=c(5, 8, 5, 8), pty = 's', bg = NA)   
+plot(x, yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized at intensity \n with variable RRed",
+        ylab = expression('OxD'['roGFP']), xlab = expression('R'['410/470']),
+     col = colors[1])
+
+
+
+for (i in 2:length(maxRed_values)) {
+  x <- seq(maxRed_values[i], maxOx, by = 0.001)
+  magX <- length(x)
+
+  yOx_i <- FOx(x, rep(maxRed_values[i], each = magX), 
+        rep(maxOx, each = magX), 
+        rep(delta, each = magX))
+  points(x, yOx_i, col = colors[i], type = 'l')
+  
+}
+
+options(digits = 4)
+legend("topright", title = "RRed", inset=c(-0.4,0), xpd=TRUE, as.character(format(maxRed_values, nsmall = 2)), pch = rep(19, each = 6), col = colors[1:length(maxRed_values)])
+
+dev.copy(pdf,'plot1_2.pdf')
 ```
 
 ## 4 parameters --> E
 
-**At fixed E = -265, vary delta**
+**At fixed E0 = -265, vary delta**
 
 ```{r}
 # Define the Nernst function
@@ -75,6 +114,13 @@ dev.copy(pdf,'plot1.pdf', compress = FALSE)
 ``` 
 
 ```{r}
+maxRed <- 0.667
+maxOx <- 5.207
+delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
+
+x <- seq(maxRed, maxOx, by = 0.001)
+magX <- length(x)
+
 yE = FE(-265, x, rep(maxRed, each = magX), 
         rep(maxOx, each = magX), 
         rep(delta_values[1], each = magX))
@@ -82,9 +128,9 @@ yE = FE(-265, x, rep(maxRed, each = magX),
 par(mar=c(5, 5, 5, 8), pty = 's', bg = NA)   
 plot(x, yE,
         type = 'l', main = "
-     Redox Potential",
+     Redox potential with variable delta",
         ylab = expression('E'['roGFP']), xlab = expression('R'['410/470']),
-     col = colors[1])
+     col = colors[1], ylim = c(-350, -175))
 
 
 
@@ -99,7 +145,7 @@ for (i in 2:length(delta_values)) {
 options(digits = 4)
 legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:6])
 
-dev.copy(pdf,'plot2.pdf', compress = FALSE)
+dev.copy(pdf,'plot2_1.pdf', compress = FALSE)
 
 ```
 
@@ -107,19 +153,26 @@ dev.copy(pdf,'plot2.pdf', compress = FALSE)
 
 
 ```{r}
+maxRed <- 0.667
+maxOx <- 5.207
+delta <- 0.171
+
+x <- seq(maxRed, maxOx, by = 0.001)
+magX <- length(x)
+
 E0_values <- c(200, 100,0,  -100, -200, -300, -400)
 
 yE = FE(E0_values[1], x, rep(maxRed, each = magX), 
         rep(maxOx, each = magX), 
-        rep(0.171, each = magX))
+        rep(delta, each = magX))
 
 par(mar=c(5, 5, 5, 8), pty = 's', bg = NA) 
 
 plot(x, yE,
         type = 'l', main = "
-     Redox Potential",
+     Redox potential with variable E0",
         ylab = expression('E'['roGFP']), xlab = expression('R'['410/470']),
-     col = colors[1], ylim = c(-500, 300))
+     col = colors[1], ylim = c(-500, 400))
 
 
 
@@ -134,7 +187,7 @@ for (i in 2:length(E0_values)) {
 options(digits = 4)
 legend("topright", title = 'E0', inset=c(-0.5,0), xpd=TRUE, as.character(format(E0_values, nsmall = 3)), pch = rep(19, each = length(E0_values)), col = colors[1:length(E0_values)])
 
-dev.copy(pdf,'plot2.pdf', compress = FALSE)
+dev.copy(pdf,'plot2_2.pdf', compress = FALSE)
 
 ```
 
