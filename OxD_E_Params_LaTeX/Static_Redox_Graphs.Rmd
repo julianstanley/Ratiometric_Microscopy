@@ -2,7 +2,7 @@
 title: "Static_Redox_Graphs"
 author: "Julian Stanley"
 date: "September 24, 2018"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -132,7 +132,7 @@ for (i in 2:length(E0_values)) {
 }
 
 options(digits = 4)
-legend("topright", title = 'E0', inset=c(-0.4,0), xpd=TRUE, as.character(format(E0_values, nsmall = 3)), pch = rep(19, each = length(E0_values)), col = colors[1:length(E0_values)])
+legend("topright", title = 'E0', inset=c(-0.5,0), xpd=TRUE, as.character(format(E0_values, nsmall = 3)), pch = rep(19, each = length(E0_values)), col = colors[1:length(E0_values)])
 
 dev.copy(pdf,'plot2.pdf', compress = FALSE)
 
