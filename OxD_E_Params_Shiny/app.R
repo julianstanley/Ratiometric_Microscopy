@@ -46,11 +46,20 @@ ui <- fluidPage(
     # Main panel for displaying outputs ----
     mainPanel(
       
+      splitLayout(cellWidths = c("50%", "50%"), plotOutput("oxdPlot"), plotOutput("ePlot")), 
+      
       # Output: OxD plot ----
-      plotOutput(outputId = "oxdPlot"),
+      #plotOutput(outputId = "oxdPlot", width = "50%"),
       
       # Output: E plot
-      plotOutput(outputId = "ePlot")
+      #plotOutput(outputId = "ePlot", width = "50%"),
+      
+      # Output: D Partial plot, E
+      plotOutput(outputId = "ePartialPlot", width = "50%")
+      
+      # Output: ROx Partial plot
+      
+      # Output: RRed Partial plot
     )
   )
 )
@@ -77,7 +86,7 @@ server <- function(input, output, session) {
     
     # Create a line plot with the samples input values
     plot(x, yOx,
-         type = 'l', main = "Fraction of sensor molecules oxidized at intensity",
+         type = 'l', main = "Fraction of molecules oxidized at intensity",
           ylab = expression('OxD'['roGFP']), xlab = expression('R'['410/470']))
     
   }, res = 92)
@@ -121,7 +130,37 @@ server <- function(input, output, session) {
 
   }, res = 92)
   
+  # Define the partial with respect to delta plot
+  output$ePartialPlot <- renderPlot({
+    
+    # Define the Nernst partial equation
+    PD <- function(z, r, o, d, e) {
+      return (
+        (12.71 * (-r+z) * 
+        (-r+d * (o-z)+z) * 
+        ((o-z)/(-r+d *(o-z)+z)^3-((o-z)  *
+        (1-(-r+z)/(-r+d * (o-z)+z)))/((-r+z) *
+        (-r+d * (o-z)+z)^2)))/(1-(-r+z)/(-r+d * (o-z)+z))
+      )
+    }
+    
+    # Generate samples values between the maximally reduced and oxidized values
+    x <- seq(input$maxRed, input$maxOx, by = 0.001)
+    magX <- length(x)
+    yPD = PD(x, rep(input$maxRed, each = magX), 
+              rep(input$maxOx, each = magX), 
+              rep(input$delta, each = magX),
+              rep(input$e0, each = magx))
+    
+    # Create a line plot with the samples input values
+    plot(x, yPD,
+         type = 'l', main = "Redox potential at intensity",
+         ylab = "Partial of d/E", xlab = expression('R'['410/470']))
+    
+    
+  }, res = 92)
   }
+  
 
 # Create Shiny app ----
 shinyApp(ui = ui, server = server)
