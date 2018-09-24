@@ -1,7 +1,10 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{textcomp}
-\title{Redox Derivations}
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage[subsection]{placeins}
+\title{roGFP Derivations \& Sensitivity Analysis}
 \author{Julian Stanley, Javier Apfeld}
 \date{September 2018}
 
@@ -97,6 +100,29 @@ OxD = \frac{\frac{I_{410}}{I_{470}} - R_{Red}}{\frac{I_{410}}{I_{470}}-R_{Red} +
 Where $\delta_{470}$ describes the sensor-specific dynamic range $470nm$.
 
 \section{Analyzing the conversion between intensity ratio and ratio of oxidized molecules}
+
+There are 4 parameters that fit into the determination of the fraction of oxidized molecules at any given point:
+
+\begin{enumerate}
+    \item $R_{410/470}$ is the ratio of intensity at 410/470, which is usually the observed value of interest.
+    \item $R_{Red}$ is the minimal intensity value at 410/470 (when the sensor is maximally reduced).
+    \item $R_{Ox}$ is the maximal intensity value at 410/470 (when the sensor is maximally oxidized).
+    \item $\delta_{470}$ is the dynamic range of the sensor at 470 (ratio of 470 at maximally reduced and maximally oxidized, respectively).
+\end{enumerate}
+
+Experimentally, our function's true input is $R_{410/470}$, so we can plot the fraction oxidized as a function of $R_{410/470}$.  \\
+
+Note that the $OxD \propto \frac{c}{d-\delta{470}}$ (Figure 1). And that 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[page=1,width=.75\textwidth]{plot1.pdf}
+    \caption{The relationship between observed intensity and OxD with different $\delta_{470}$ constants}
+    \label{fig:my_label}
+\end{figure}
+
+
+\FloatBarrier
 
 \section{Converting fraction of oxidized sensors into an electric potential}
 
