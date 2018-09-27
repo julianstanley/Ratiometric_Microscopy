@@ -1,0 +1,10 @@
+name: walkthrough
+title:
+username:
+account: julianstanley
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 473113
+bundleId: 1609542
+url: https://julianstanley.shinyapps.io/walkthrough/
+when: 1538065588.75852

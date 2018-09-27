@@ -193,3 +193,56 @@ dev.copy(pdf,'plot2_2.pdf', compress = FALSE)
 
 
 
+
+```{r}
+# Define error in delta
+
+
+m + 12.71 Log[(
+   1 - (-r + z)/(-r + d (o - z) + z))/((-r + z) (-r + d (o - z) + z))]
+```
+
+```{r}
+
+# Vary delta
+
+maxRed <- 0.667
+maxOx <- 5.207
+delta <- 0.171
+
+x <- seq(maxRed, maxOx, by = 0.001)
+magX <- length(x)
+
+E0_values <- c(200, 100,0,  -100, -200, -300, -400)
+
+yE = FE(E0_values[1], x, rep(maxRed, each = magX), 
+        rep(maxOx, each = magX), 
+        rep(delta, each = magX))
+
+par(mar=c(5, 5, 5, 8), pty = 's', bg = NA) 
+
+plot(x, yE,
+        type = 'l', main = "
+     Redox potential with variable E0",
+        ylab = expression('E'['roGFP']), xlab = expression('R'['410/470']),
+     col = colors[1], ylim = c(-500, 400))
+
+
+
+for (i in 2:length(E0_values)) {
+  yE_i <- FE(E0_values[i], x, rep(maxRed, each = magX), 
+        rep(maxOx, each = magX), 
+        rep(0.171, each = magX))
+  points(x, yE_i, col = colors[i], type = 'l')
+  
+}
+
+options(digits = 4)
+legend("topright", title = 'E0', inset=c(-0.5,0), xpd=TRUE, as.character(format(E0_values, nsmall = 3)), pch = rep(19, each = length(E0_values)), col = colors[1:length(E0_values)])
+
+dev.copy(pdf,'plot2_2.pdf', compress = FALSE)
+
+
+
+
+```
