@@ -1240,11 +1240,72 @@ plot(R, yE,
 
 ### dOxD/dR' (D470) vs R'
 
-
-
 TODO: See latex, then graph
 
-### dE(D470)/dR' vs R'
+### dE/dR' (D470) vs R'
+
+Still $$ \frac{\partial E}{\partial R'} = \frac{RT}{F^2} \frac{(\delta (Rmin^2 + 2RminRmax - 3RminR' + Rmax^2 - 3RmaxR' + 2R'^2))}{R'(Rmin + Rmax - R')(\delta * (Rmin + Rmax - R') + R')} $$
+
+```{r}
+# Define dE/dR'
+dEdR <- function(RPrime, Rmin, Rmax, delta) {
+      return (
+        12.71 * 
+          (delta * (Rmin^2 + 2 *   Rmin * Rmax - 3 * Rmin * RPrime + Rmax^2 - 3*Rmax*RPrime +  
+                      2*RPrime^2) + RPrime*(3*Rmin + 3*Rmax - 2*RPrime)) /
+          (RPrime * (Rmin + Rmax - RPrime) * 
+             (delta * (Rmin + Rmax - RPrime) + RPrime))
+      )
+}
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and Rmin
+# Assume: Maximum ratio of 5.207 and a minimum of 0.667
+# Assume: e0 of -265
+Rmin <- 0.667
+Rmax <- 5.207
+delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
+
+# Generate inital values of R
+R <- seq(0, Rmax + Rmin, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = dEdR(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[1], each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot(R, yE,
+        type = 'l', main = "
+     dEdR'",
+        ylab = expression('dE'['roGFP']), xlab = expression("dR'"['410/470']),
+        xlim = c(0, Rmax + Rmin),
+        ylim = c(0, 60),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(delta_values)) {
+  # Generate temporary values of oxD
+  yE = dEdR(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[i], each = magR))
+  
+  # Plot temporary value
+  points(R, yE, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
+```
 
 TODO: See latex, then graph
 
