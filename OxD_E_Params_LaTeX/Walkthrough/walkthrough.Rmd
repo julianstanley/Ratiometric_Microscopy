@@ -1191,13 +1191,56 @@ plot(R, yOXD,
 ```
 
 
-TODO: See latex, then graph
-
 ### dE/dR' vs R'
 
-TODO: See latex, then graph
+$$ \frac{\partial E}{\partial R'} = \frac{RT}{F^2} \frac{(\delta (Rmin^2 + 2RminRmax - 3RminR' + Rmax^2 - 3RmaxR' + 2R'^2))}{R'(Rmin + Rmax - R')(\delta * (Rmin + Rmax - R') + R')} $$
+
+```{r}
+# Define dE/dR'
+
+dEdR <- function(RPrime, Rmin, Rmax, delta) {
+      return (
+        12.71 * 
+          (delta * (Rmin^2 + 2 *   Rmin * Rmax - 3 * Rmin * RPrime + Rmax^2 - 3*Rmax*RPrime +  
+                      2*RPrime^2) + RPrime*(3*Rmin + 3*Rmax - 2*RPrime)) /
+          (RPrime * (Rmin + Rmax - RPrime) * 
+             (delta * (Rmin + Rmax - RPrime) + RPrime))
+      )
+}
+
+
+# Define constants and Rmin
+# Assume: Maximum ratio of 5.207 and a minimum of 0.667
+# Assume: Delta of 0.171
+# Assume: E0 of -265
+Rmin <- 0.667
+Rmax <- 5.207
+delta <- 0.171
+
+# Generate inital values of R
+R <- seq(0, Rmax+Rmin, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = dEdR(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta, each = magR))
+     
+# Set  size
+par(pty = 's') 
+
+# Plotvalue
+plot(R, yE,
+        type = 'l', main = "
+     dE/dR",
+        ylab = "dE", xlab = expression('dR'['410/470']),
+        xlim = c(0, Rmax+Rmin), 
+        ylim = c(0, 300))
+```
 
 ### dOxD/dR' (D470) vs R'
+
+
 
 TODO: See latex, then graph
 
