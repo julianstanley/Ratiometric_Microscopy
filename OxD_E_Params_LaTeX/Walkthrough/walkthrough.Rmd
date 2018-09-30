@@ -1307,9 +1307,25 @@ options(digits = 4)
 legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
 ```
 
-TODO: See latex, then graph
-
 ### Empirical Errors
+
+### $\Delta \delta$ in OxD
+
+### $\Delta \delta$ in E
+
+### $\Delta R'$ in OxD
+
+### $\Delta R'$ in E
+
+### $\Delta Rmin$ in OxD
+
+### $\Delta Rmin$ in E
+
+### $\Delta Rmax$ in OxD
+
+### $\Delta Rmax$ in E
+
+### $\Delta E^o$ in E
 
 TODO: See latex, then graph. Expand for each variable and either OxD X 4 vars or E X 5 vars
 
