@@ -1,0 +1,201 @@
+---
+title: ""
+author: ""
+date: ""
+output: 
+  html_document:
+    code_folding: hide
+---
+
+# Table of contents
+
+<font size="4">
+
+* [Digitized Spectra](#dig)
+
+
+* [Fraction of sensors oxidized](#oxd)
+
+    + [OxD(R)](#oxdr)
+    
+    + [OxD(R')](#oxdrp)
+    
+    + [OxD(R'')](#oxdrpp)
+    
+    
+* [Half cell potential](#e)
+
+    + [E(R)](#er)
+    
+    + [E(R')](#erp)
+    
+    + [E(R'')](#erpp)
+    
+</font>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r initalImport}
+source("Spectra_source.R")
+
+# Import data
+gfp1_dat <- read.csv("rogfp1.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+gfp2_dat <- read.csv("rogfp2.csv", header = FALSE, stringsAsFactors=FALSE,
+                     fileEncoding="UTF-8-BOM")
+
+# Create GFP1
+GFP1 <- SensorPoint(gfp1_dat$V1, gfp1_dat$V2, gfp1_dat$V3, gfp1_dat$V4, -288)
+
+# Create GFP 2
+GFP2 <- SensorPoint(gfp2_dat$V1, gfp2_dat$V2, gfp2_dat$V3, gfp2_dat$V4, -272)
+
+# Create cata ROGFP1-R12
+R12 <- SensorValues(Rmax = 5.207, Rmin = 0.667, delta = 0.171, lambda_1 = 410, lambda_2 = 470)
+```
+
+
+<a id="dig"></a>
+
+### Digitized Spectra
+
+```{r Spectra}
+# Plot GFP 1 and 2
+par(mfrow = c(1, 2), pty = 's')
+plotOxRed(GFP1, main = "GFP1")
+plotOxRed(GFP2, main = "GFP2")
+
+# Plot 
+par(mfrow = c(1,1), pty = 's')
+plotOxRed(R12, main = "R12 predicted", type = "p")
+```
+
+<a id="oxd"></a>
+
+<a id="oxdr"></a>
+
+```{r R}
+# Plot OxD vs R
+
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotROxD(GFP1, 395, 405, 475, 485, main = "GFP1", status = TRUE)
+plotROxD(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple", points = TRUE);
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+
+```
+
+Although the curves look similar when plotted seperately: 
+```{r RContinued}
+
+par(pty = 's', mfrow = c(1,2))
+# GFP1
+plotROxD(GFP1, 395, 405, 475, 485, main = "GFP1", status = TRUE)
+
+# GFP2
+plotROxD(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple")
+
+# Theoretical Sensor with Rmax = 6, delta = 0.2
+#plotROxD(SpectraValues(Rmax = 6, Rmin = 1, delta = 0.2, lambda_1 = 410, lambda_2 = 470), 410, 410, 470, 470, main = "delta = 0.2")
+
+# Theoretical Sensor with Rmax = 6, delta = 1
+#plotROxD(SpectraValues(Rmax = 6, Rmin = 1, delta = 1, lambda_1 = 410, lambda_2 = 470), 410, 410, 470, 470, main = "delta = 1.0")
+```
+
+<a id="oxdrp"></a>
+
+With normalized R' (R' = R/Rmin):
+
+```{r RPrime}
+# Plot OxD vs R'
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotRPrimeOxD(GFP2, 395, 405, 490, 500, main = "GFP2", color = "purple", status = TRUE);
+plotRPrimeOxD(GFP1, 395, 405, 475, 485, main = "GFP1", points = TRUE)
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+
+
+# Theoretical Sensor with Rmax = 6, delta = 0.2
+#plotRPrimeOxD(SpectraValues(Rmax = 6, Rmin = 1, delta = 0.2, lambda_1 = 410, lambda_2 = 470), 410, 410, 470, 470, main = "delta = 0.2")
+
+# Theoretical Sensor with Rmax = 6, delta = 1
+#plotRPrimeOxD(SpectraValues(Rmax = 6, Rmin = 1, delta = 1, lambda_1 = 410, lambda_2 = 470), 410, 410, 470, 470, main = "delta = 1.0")
+```
+
+<a id="oxdrpp"></a>
+
+With normalized R'' (R'' = R-Rmin/Rmax-Rmin):
+
+```{r RDoublePrime}
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotRDoublePrimeOxD(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple");
+plotRDoublePrimeOxD(GFP1, 395, 405, 475, 485, main = "GFP1", points = TRUE)
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+```
+
+<a id="e"></a>
+E
+<a id="er"></a>
+E(R)
+With ratio R:
+```{r RE}
+# Plot E vs R
+
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotRE(GFP1, 395, 405, 475, 485, main = "GFP1")
+plotRE(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple", points = TRUE);
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+
+```
+
+
+Although the curves look similar when plotted seperately: 
+```{r RECont}
+par(pty = 's', mfrow = c(1,2))
+# GFP1
+plotRE(GFP1, 395, 405, 475, 485, main = "GFP1")
+
+# GFP2
+plotRE(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple")
+```
+
+<a id="erp"></a>
+
+With R':
+
+```{r REPrime}
+# Plot OxD vs R'
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotRPrimeE(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple");
+plotRPrimeE(GFP1, 395, 405, 475, 485, main = "GFP1", points = TRUE)
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+```
+
+<a id="erpp"></a>
+
+With normalized R'' (R'' = R-Rmin/Rmax-Rmin):
+
+```{r REDoublePrime}
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotRDoublePrimeE(GFP2, 395, 405, 490, 500, main = "GFP2", col = "purple");
+plotRDoublePrimeE(GFP1, 395, 405, 475, 485, main = "GFP1", points = TRUE)
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+```
+
+Now let's try some errors
+
+First, derivative of OxD with respect to R
+```{r }
+# Together
+par(mfrow = c(1,1), pty = 's')
+plotROxD(GFP1, 395, 405, 490, 500, main = "GFP2", col = "purple", equation = dOxDdR, ylab = "dOxD", ylim = c(-100,100));
+plotROxD(GFP2, 395, 405, 475, 485, main = "GFP1", points = TRUE, equation = dOxDdR, ylim = c(-100,100))
+
+legend("topright", title = "Sensor", inset=c(-0.35,0), xpd=TRUE, c("GFP1", "GFP2"), pch = c(19,19), col = c("black", "purple"))
+```

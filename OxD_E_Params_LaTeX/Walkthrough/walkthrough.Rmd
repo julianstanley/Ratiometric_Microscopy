@@ -37,7 +37,9 @@ plot(oxD, E, type = 'l', main = "Cell potential as a \n function of fraction oxi
 
 ``` 
 
-### OxD(Rmax) vs R
+**This graph doesn't change upon reparameterization with R' or R''**
+
+### Changing Rmax scales the plots of R and R', but not the normalized R''
 
 ```{r}
 # Define the fraction oxidized
@@ -100,7 +102,94 @@ options(digits = 4)
 legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
 ```
 
-### OxD(Rmin) vs R
+**R'**
+
+```{r}
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot(R/Rmin, yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized at intensity \n by measured ratio",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
+        xlim = c(1, max(Rmax_values)/Rmin),
+     col = colors[1])
+
+# Plot each variable Rmax
+for (i in 2:length(Rmax_values)) {
+  # Generate temporary values of R
+  R <- seq(Rmin, Rmax_values[i], by = 0.001)
+  magR <- length(R)
+
+  # Generate temporary values of oxD
+  yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax_values[i], each = magR), 
+        rep(delta, each = magR))
+  
+  # Plot temporary value
+  points(R/Rmin, yOx, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
+```
+
+**R''**
+
+```{r}
+# Define the R'' function oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        ((R-Rmin)/(Rmax-Rmin))
+        / ( 
+            ((R-Rmin)/(Rmax-Rmin)) - (delta*((R-Rmin)/((Rmax-Rmin)))) + delta
+          )
+      )
+}
+
+# Generate inital values of oxD
+yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax_values[1], each = magR), 
+        rep(delta, each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot((R-Rmin)/(Rmax_values[1]-Rmin), yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized at intensity \n by measured ratio",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R''"['410/470']),
+        xlim = c(0, 1),
+        ylim = c(0, 1),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(Rmax_values)) {
+  # Generate temporary values of R
+  R <- seq(Rmin, Rmax_values[i], by = 0.001)
+  magR <- length(R)
+
+  # Generate temporary values of oxD
+  yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax_values[i], each = magR), 
+        rep(delta, each = magR))
+  
+  # Plot temporary value
+  points((R-Rmin)/(Rmax_values[i]-Rmin), yOx, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
+```
+
+
+
+### Changing Rmin has the essentially same effect as Rmax, but from the opposite direction
 
 ```{r}
 # Define the fraction oxidized
@@ -163,9 +252,12 @@ options(digits = 4)
 legend("topright", title = expression(R['min']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmin_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmin_values)])
 ```
 
+**Optional: Add graphs in
 
-### OxD(D470) vs R
+### The relative shapes of different values of D470 do not change with reparameterization
+**D470 represents the relative amount of dynamic range that can be attributed to the 470nm channel**
 
+**R**
 ```{r}
 # Define the fraction oxidized
 OXD <- function(R, Rmin, Rmax, delta) {
@@ -222,8 +314,103 @@ options(digits = 4)
 legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
 ```
 
+**R'**
+```{r}
+# Generate inital values of oxD
+yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[1], each = magR))
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot(R/Rmin, yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized at intensity \n by measured ratio",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
+        xlim = c(1, Rmax/Rmin),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(delta_values)) {
+  # Generate temporary values of oxD
+  yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[i], each = magR))
+  
+  # Plot temporary value
+  points(R/Rmin, yOx, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
+```
+
+**R''**
+```{r}
+# Define the R'' function oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        ((R-Rmin)/(Rmax-Rmin))
+        / ( 
+            ((R-Rmin)/(Rmax-Rmin)) - (delta*((R-Rmin)/((Rmax-Rmin)))) + delta
+          )
+      )
+}
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and delta
+# Assume: Maximum ratio of 5.207 and minimum of 0.667
+Rmin <- 0.667
+Rmax <- 5.207
+delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
+
+
+# Generate values of R
+R <- seq(Rmin, Rmax, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[1], each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot((R-Rmin)/(Rmax-Rmin), yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized at intensity \n by measured ratio",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R''"['410/470']),
+        xlim = c(0, 1),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(delta_values)) {
+  # Generate temporary values of oxD
+  yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[i], each = magR))
+  
+  # Plot temporary value
+  points((R-Rmin)/(Rmax-Rmin), yOx, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
+```
+
 ### E(Rmax) vs R
 
+**R**
 ```{r}
 # Define OxD
 OXD <- function(R, Rmin, Rmax, delta) {
@@ -292,7 +479,149 @@ options(digits = 4)
 legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
 ```
 
-### E(Rmin) vs R
+**R'**
+```{r}
+# Define OxD
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        (R - Rmin)/((R - Rmin) + (delta*(Rmax - R)))
+      )
+}
+# Define the Nernst function in full terms
+E_OXD <- function(e0, R, Rmin, Rmax, delta) {
+      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
+                              /(OXD(R, Rmin, Rmax, delta))))
+    }
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and Rmax
+# Assume: Minimum ratio of 0.667
+# Assume: Delta of 0.171
+# Assume: e0 of -265
+Rmin <- 0.667
+Rmax_values <- c(2, 4, 6, 8, 10, 12)
+delta <- 0.171
+e0 <- -265
+
+
+# Generate inital values of R
+R <- seq(Rmin, Rmax_values[1], by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax_values[1], each = magR), 
+        rep(delta, each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot(R/Rmin, yE,
+        type = 'l', main = "
+     Half cell potential at intensity \n by measured ratio",
+        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
+        xlim = c(1, max(Rmax_values)/Rmin),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(Rmax_values)) {
+  # Generate temporary values of R
+  R <- seq(Rmin, Rmax_values[i], by = 0.001)
+  magR <- length(R)
+
+  # Generate temporary values of oxD
+  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax_values[i], each = magR), 
+        rep(delta, each = magR))
+  
+  # Plot temporary value
+  points(R/Rmin, yE, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
+```
+
+**R''**
+```{r}
+# Define the R'' function oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        ((R-Rmin)/(Rmax-Rmin))
+        / ( 
+            ((R-Rmin)/(Rmax-Rmin)) - (delta*((R-Rmin)/((Rmax-Rmin)))) + delta
+          )
+      )
+}
+
+# Define the Nernst function in full terms
+E_OXD <- function(e0, R, Rmin, Rmax, delta) {
+      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
+                              /(OXD(R, Rmin, Rmax, delta))))
+    }
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and Rmax
+# Assume: Minimum ratio of 0.667
+# Assume: Delta of 0.171
+# Assume: e0 of -265
+Rmin <- 0.667
+Rmax_values <- c(2, 4, 6, 8, 10, 12)
+delta <- 0.171
+e0 <- -265
+
+
+# Generate inital values of R
+R <- seq(Rmin, Rmax_values[1], by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax_values[1], each = magR), 
+        rep(delta, each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot((R-Rmin)/(Rmax_values[1]-Rmin), yE,
+        type = 'l', main = "
+     Half cell potential at intensity \n by measured ratio",
+        ylab = expression('E'['roGFP']), xlab = expression("R''"['410/470']),
+        xlim = c(0, 1),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(Rmax_values)) {
+  # Generate temporary values of R
+  R <- seq(Rmin, Rmax_values[i], by = 0.001)
+  magR <- length(R)
+
+  # Generate temporary values of oxD
+  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax_values[i], each = magR), 
+        rep(delta, each = magR))
+  
+  # Plot temporary value
+  points((R-Rmin)/(Rmax_values[i]-Rmin), yE, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
+```
+
+### E(Rmin) vs R is similarly changed by reparameterization
 
 ```{r}
 # Define OxD
@@ -364,6 +693,7 @@ legend("topright", title = expression(R['min']), inset=c(-0.35,0), xpd=TRUE, as.
 
 ### E(D470) vs R
 
+**R**
 ```{r}
 # Define OxD
 OXD <- function(R, Rmin, Rmax, delta) {
@@ -420,6 +750,137 @@ for (i in 2:length(delta_values)) {
   
   # Plot temporary value
   points(R, yE, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
+```
+
+**R'**
+```{r}
+# Define OxD
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        (R - Rmin)/((R - Rmin) + (delta*(Rmax - R)))
+      )
+}
+# Define the Nernst function in full terms
+E_OXD <- function(e0, R, Rmin, Rmax, delta) {
+      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
+                              /(OXD(R, Rmin, Rmax, delta))))
+    }
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and Rmin
+# Assume: Maximum ratio of 5.207 and a minimum of 0.667
+# Assume: e0 of -265
+Rmin <- 0.667
+Rmax <- 5.207
+delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
+e0 <- -265
+
+
+# Generate inital values of R
+R <- seq(Rmin, Rmax, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[1], each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot(R/Rmin, yE,
+        type = 'l', main = "
+     Half cell potential at intensity \n by measured ratio",
+        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
+        xlim = c(1, Rmax/Rmin),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(delta_values)) {
+  # Generate temporary values of oxD
+  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[i], each = magR))
+  
+  # Plot temporary value
+  points(R/Rmin, yE, type = 'l', col = colors[i])
+  
+}
+
+options(digits = 4)
+legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
+```
+
+**R''**
+```{r}
+# Define the R'' function oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        ((R-Rmin)/(Rmax-Rmin))
+        / ( 
+            ((R-Rmin)/(Rmax-Rmin)) - (delta*((R-Rmin)/((Rmax-Rmin)))) + delta
+          )
+      )
+}
+# Define the Nernst function in full terms
+E_OXD <- function(e0, R, Rmin, Rmax, delta) {
+      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
+                              /(OXD(R, Rmin, Rmax, delta))))
+    }
+
+# Get some colors
+suppressWarnings(require(RColorBrewer, quietly = TRUE))
+colors <- brewer.pal(n = 8, 'Dark2')
+
+# Define constants and Rmin
+# Assume: Maximum ratio of 5.207 and a minimum of 0.667
+# Assume: e0 of -265
+Rmin <- 0.667
+Rmax <- 5.207
+delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
+e0 <- -265
+
+
+# Generate inital values of R
+R <- seq(Rmin, Rmax, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[1], each = magR))
+     
+# Set margins and size
+par(mar=c(5, 5, 5, 8), pty = 's') 
+
+# Plot inital value
+plot((R-Rmin)/(Rmax-Rmin), yE,
+        type = 'l', main = "
+     Half cell potential at intensity \n by measured ratio",
+        ylab = expression('E'['roGFP']), xlab = expression('R'['410/470']),
+        xlim = c(0, 1),
+     col = colors[1])
+
+
+# Plot each variable Rmax
+for (i in 2:length(delta_values)) {
+  # Generate temporary values of oxD
+  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta_values[i], each = magR))
+  
+  # Plot temporary value
+  points((R-Rmin)/(Rmax-Rmin), yE, type = 'l', col = colors[i])
   
 }
 
@@ -581,548 +1042,9 @@ plot(R, yE,
 
 TODO: See latex
 
-### ------------ Repeat with R' = R-Rmin  -------------
+### ------------ Repeat with everything with a different scale-------------
 
-### OxD(Rmax) vs R'
 
-```{r}
-# Define the fraction oxidized
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmax
-# Assume: Minimum ratio of 0.667
-# Assume: Delta of 0.171
-Rmin <- 0.667
-Rmax_values <- c(2, 3, 4, 5, 6, 8, 10, 12)
-delta <- 0.171
-
-
-# Generate inital values of R'
-R <- seq(0, Rmax_values[1] - Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yOx = OXD(R, rep(Rmin, each = magR), 
-        rep(Rmax_values[1], each = magR), 
-        rep(delta, each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yOx,
-        type = 'l', main = "
-     Fraction of molecules oxidized at intensity \n by measured ratio",
-        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, max(Rmax_values)),
-        ylim = c(0, 1),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(Rmax_values)) {
-  # Generate temporary values of R
-  R <- seq(0, Rmax_values[i] - Rmin, by = 0.001)
-  magR <- length(R)
-
-  # Generate temporary values of oxD
-  yOx = OXD(R, rep(Rmin, each = magR), 
-        rep(Rmax_values[i], each = magR), 
-        rep(delta, each = magR))
-  
-  # Plot temporary value
-  points(R, yOx, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
-```
-
-### OxD(Rmin) vs R'
-
-```{r}
-# Define the fraction oxidized
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207
-# Assume: Delta of 0.171
-Rmin_values <- c(0.5, 1, 1.5, 2, 2.5, 3.0, 3.5, 4.0)
-Rmax <- 5.207
-delta <- 0.171
-
-
-# Generate inital values of R
-R <- seq(0, Rmax - Rmin[1], by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yOx = OXD(R, rep(Rmin_values[1], each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yOx,
-        type = 'l', main = "
-     Fraction of molecules oxidized at intensity \n by measured ratio",
-        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(Rmin_values)) {
-  # Generate temporary values of R
-  R <- seq(0, Rmax - Rmin_values[i], by = 0.001)
-  magR <- length(R)
-
-  # Generate temporary values of oxD
-  yOx = OXD(R, rep(Rmin_values[i], each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-  
-  # Plot temporary value
-  points(R, yOx, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(R['min']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmin_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmin_values)])
-```
-
-
-### OxD(D470) vs R'
-
-```{r}
-# Define the fraction oxidized
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and delta
-# Assume: Maximum ratio of 5.207 and minimum of 0.667
-Rmin <- 0.667
-Rmax <- 5.207
-delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
-
-
-# Generate values of R
-R <- seq(0, Rmax+Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yOx = OXD(R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta_values[1], each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yOx,
-        type = 'l', main = "
-     Fraction of molecules oxidized at intensity \n by measured ratio",
-        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax+Rmin),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(delta_values)) {
-  # Generate temporary values of oxD
-  yOx = OXD(R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta_values[i], each = magR))
-  
-  # Plot temporary value
-  points(R, yOx, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
-```
-
-### E(Rmax) vs R'
-
-```{r}
-# Define OxD
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-# Define the Nernst function in full terms
-E_OXD <- function(e0, R, Rmin, Rmax, delta) {
-      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
-                              /(OXD(R, Rmin, Rmax, delta))))
-    }
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmax
-# Assume: Minimum ratio of 0.667
-# Assume: Delta of 0.171
-# Assume: e0 of -265
-Rmin <- 0.667
-Rmax_values <- c(2, 4, 6, 8, 10, 12)
-delta <- 0.171
-e0 <- -265
-
-
-# Generate inital values of R
-R <- seq(0, Rmax_values[1] + Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yE = E_OXD(e0, R, rep(Rmin, each = magR), 
-        rep(Rmax_values[1], each = magR), 
-        rep(delta, each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yE,
-        type = 'l', main = "
-     Half cell potential at intensity \n by measured ratio",
-        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, max(Rmax_values) + Rmin),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(Rmax_values)) {
-  # Generate temporary values of R
-  R <- seq(0, Rmax_values[i] + Rmin, by = 0.001)
-  magR <- length(R)
-
-  # Generate temporary values of oxD
-  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
-        rep(Rmax_values[i], each = magR), 
-        rep(delta, each = magR))
-  
-  # Plot temporary value
-  points(R, yE, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(R['max']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmax_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmax_values)])
-```
-
-### E(Rmin) vs R'
-
-```{r}
-# Define OxD
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Define the Nernst function in full terms
-E_OXD <- function(e0, R, Rmin, Rmax, delta) {
-      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
-                              /(OXD(R, Rmin, Rmax, delta))))
-    }
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207
-# Assume: Delta of 0.171
-# Assume: e0 of -265
-Rmin_values <- c(0.5, 1, 1.5, 2, 2.5, 3.0, 3.5, 4.0)
-Rmax <- 5.207
-delta <- 0.171
-e0 <- -265
-
-
-# Generate inital values of R
-R <- seq(0, Rmax+Rmin_values[1], by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yE = E_OXD(e0, R, rep(Rmin_values[1], each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yE,
-        type = 'l', main = "
-     Half cell potential at intensity \n by measured ratio",
-        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax + Rmin_values[8]),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(Rmin_values)) {
-  # Generate temporary values of R
-  R <- seq(0, Rmax + Rmin_values[i], by = 0.001)
-  magR <- length(R)
-
-  # Generate temporary values of oxD
-  yE = E_OXD(e0, R, rep(Rmin_values[i], each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-  
-  # Plot temporary value
-  points(R, yE, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(R['min']), inset=c(-0.35,0), xpd=TRUE, as.character(format(Rmin_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(Rmin_values)])
-```
-
-### E(D470) vs R'
-
-```{r}
-# Define OxD
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-# Define the Nernst function in full terms
-E_OXD <- function(e0, R, Rmin, Rmax, delta) {
-      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
-                              /(OXD(R, Rmin, Rmax, delta))))
-    }
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207 and a minimum of 0.667
-# Assume: e0 of -265
-Rmin <- 0.667
-Rmax <- 5.207
-delta_values <- c(0.171, 0.5, 1.0, 2.0, 5.84)
-e0 <- -265
-
-
-# Generate inital values of R
-R <- seq(0, Rmax + Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yE = E_OXD(e0, R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta_values[1], each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yE,
-        type = 'l', main = "
-     Half cell potential at intensity \n by measured ratio",
-        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax + Rmin),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(delta_values)) {
-  # Generate temporary values of oxD
-  yE = E_OXD(e0, R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta_values[i], each = magR))
-  
-  # Plot temporary value
-  points(R, yE, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE, as.character(format(delta_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(delta_values)])
-```
-
-### E(E0) vs R'
-
-```{r}
-# Define OxD
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-# Define the Nernst function in full terms
-E_OXD <- function(e0, R, Rmin, Rmax, delta) {
-      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
-                              /(OXD(R, Rmin, Rmax, delta))))
-    }
-
-# Get some colors
-suppressWarnings(require(RColorBrewer, quietly = TRUE))
-colors <- brewer.pal(n = 8, 'Dark2')
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207 and a minimum of 0.667
-# Assume: Delta of 0.171
-Rmin <- 0.667
-Rmax <- 5.207
-delta_values <- 0.171
-e0_values <- c(200, 100,0,  -100, -200, -300, -400)
-
-# Generate inital values of R
-R <- seq(0, Rmax+Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yE = E_OXD(e0_values[1], R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-     
-# Set margins and size
-par(mar=c(5, 5, 5, 8), pty = 's') 
-
-# Plot inital value
-plot(R, yE,
-        type = 'l', main = "
-     Half cell potential at intensity \n by measured ratio",
-        ylab = expression('E'['roGFP']), xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax + Rmin),
-        ylim = c(-500, 400),
-     col = colors[1])
-
-
-# Plot each variable Rmax
-for (i in 2:length(e0_values)) {
-  # Generate temporary values of oxD
-  yE = E_OXD(e0_values[i], R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-  
-  # Plot temporary value
-  points(R, yE, type = 'l', col = colors[i])
-  
-}
-
-options(digits = 4)
-legend("topright", title = expression(E['0']), inset=c(-0.35,0), xpd=TRUE, as.character(format(e0_values, nsmall = 3)), pch = rep(19, each = 6), col = colors[1:length(e0_values)])
-```
-
-
-### OxD vs R'
-
-```{r}
-# Define the OXD function
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207 and a minimum of 0.667
-# Assume: Delta of 0.171
-Rmin <- 0.667
-Rmax <- 5.207
-delta_values <- 0.171
-
-# Generate inital values of R
-R <- seq(0, Rmax + Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yOXD = OXD(R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-     
-# Set  size
-par(pty = 's') 
-
-# Plotvalue
-plot(R, yOXD,
-        type = 'l', main = "
-     Fraction oxidized \n at measured ratio",
-        ylab = "OxD", xlab = expression("R'"['410/470']),
-        xlim = c(0, Rmax + Rmin))
-```
-
-
-### E vs R'
-
-```{r}
-# Define OxD
-OXD <- function(RPrime, Rmin, Rmax, delta) {
-      return (
-        (RPrime)/((RPrime) + (delta*(Rmax - RPrime + Rmin)))
-      )
-}
-
-# Define the Nernst function in full terms
-E_OXD <- function(e0, R, Rmin, Rmax, delta) {
-      return(e0 - 12.71 * log((1-(OXD(R, Rmin, Rmax, delta)))
-                              /(OXD(R, Rmin, Rmax, delta))))
-    }
-
-# Define constants and Rmin
-# Assume: Maximum ratio of 5.207 and a minimum of 0.667
-# Assume: Delta of 0.171
-# Assume: E0 of -265
-Rmin <- 0.667
-Rmax <- 5.207
-delta_values <- 0.171
-e0 <- -265
-
-# Generate inital values of R
-R <- seq(0, Rmax+Rmin, by = 0.001)
-magR <- length(R)
-
-# Generate inital values of oxD
-yE = E_OXD(e0, R, rep(Rmin, each = magR), 
-        rep(Rmax, each = magR), 
-        rep(delta, each = magR))
-     
-# Set  size
-par(pty = 's') 
-
-# Plotvalue
-plot(R, yE,
-        type = 'l', main = "
-     Half cell potential \n at measured ratio",
-        ylab = "E", xlab = expression('R'['410/470']),
-        xlim = c(0, Rmax+Rmin))
-```
 
 ### dE/dOxD vs OxD
 
@@ -1311,23 +1233,43 @@ legend("topright", title = expression(delta['470']), inset=c(-0.35,0), xpd=TRUE,
 
 ### $\Delta \delta$ in OxD
 
+$$\frac{\Delta OxD}{\Delta \delta}  = \frac{(R' - Rmin)}{(R'-Rmin) + x\delta (Rmax-R')} - \frac{(R' - Rmin)}{(R'-Rmin) + \delta (Rmax-R')}$$
+
+
 ### $\Delta \delta$ in E
 
+
+
 ### $\Delta R'$ in OxD
+
+$$\frac{\Delta OxD}{\Delta \delta}  = \frac{(xR' - Rmin)}{(xR'-Rmin) + \delta (Rmax-R')} - \frac{(R' - Rmin)}{(R'-Rmin) + \delta (Rmax-R')}$$
 
 ### $\Delta R'$ in E
 
 ### $\Delta Rmin$ in OxD
 
+$$\frac{\Delta OxD}{\Delta \delta}  = \frac{(R' - xRmin)}{(R'-xRmin) + \delta (Rmax-R')} - \frac{(R' - Rmin)}{(R'-Rmin) + \delta (Rmax-R')}$$
+
 ### $\Delta Rmin$ in E
 
+$$12.1 * log((1-(\frac{(R' - xRmin)}{(R'-xRmin) + \delta (Rmax-R')}))/(\frac{(R' - xRmin)}{(R'-xRmin) + \delta (Rmax-R')}))) - 12.1 * log((1-(OXD))/(OXD)))$$
+
+
+
+12.71 * log((1-(OXD))
+                              /(OXD)))
+
+
 ### $\Delta Rmax$ in OxD
+
+$$\frac{\Delta OxD}{\Delta \delta}  = \frac{(R' - Rmin)}{(R'-Rmin) + \delta (xRmax-R')} - \frac{(R' - Rmin)}{(R'-Rmin) + \delta (Rmax-R')}$$
+
 
 ### $\Delta Rmax$ in E
 
 ### $\Delta E^o$ in E
 
-TODO: See latex, then graph. Expand for each variable and either OxD X 4 vars or E X 5 vars
+TODO: See latex, then graph. 
 
 ### Background vs Binning
 

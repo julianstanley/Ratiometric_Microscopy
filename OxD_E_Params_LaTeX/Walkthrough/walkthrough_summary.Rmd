@@ -1,0 +1,87 @@
+---
+title: "Summary"
+author: "Julian Stanley"
+date: "October 18, 2018"
+output: 
+  html_document:
+    code_folding: hide
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### OxD is a function of the 410/470 intensity ratio, R
+```{r}
+# Create a 3-column pannel
+par(mfrow = c(1,3), pty = 's')
+
+# Define the fraction oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        (R - Rmin)/((R - Rmin) + (delta*(Rmax - R)))
+      )
+}
+
+# Define constants and Rmax
+# Assume: Minimum ratio of 0.667, maximum ratio of 5.207
+# Assume: Delta of 0.171
+Rmin <- 0.667
+Rmax <- 5.207
+delta <- 0.171
+
+# Generate inital values of R
+R <- seq(Rmin, Rmax, by = 0.001)
+magR <- length(R)
+
+# Generate inital values of oxD
+yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta, each = magR))
+
+# Plot OxD(R)
+plot(R, yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized",
+        ylab = expression('OxD'['roGFP']), xlab = expression('R'['410/470']),
+        xlim = c(0, Rmax))
+
+
+# Plot OxD(R')
+plot(R/Rmin, yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R'"['410/470']),
+        xlim = c(1, Rmax)/Rmin)
+
+# Define a new OxD function for R''
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        ((R-Rmin)/(Rmax-Rmin))
+        / ( 
+            ((R-Rmin)/(Rmax-Rmin)) - (delta*((R-Rmin)/((Rmax-Rmin)))) + delta
+          )
+      )
+}
+
+# Generate inital values of oxD
+yOx = OXD(R, rep(Rmin, each = magR), 
+        rep(Rmax, each = magR), 
+        rep(delta, each = magR))
+
+# Plot R''
+plot((R-Rmin)/(Rmax-Rmin), yOx,
+        type = 'l', main = "
+     Fraction of molecules oxidized",
+        ylab = expression('OxD'['roGFP']), xlab = expression("R''"['410/470']),
+        xlim = c(0, 1),
+        ylim = c(0, 1))
+
+```
+
+
+
+
+**Figure 1. From left to right, OxD plotted as a function of: (a) The acutal measured 410/470 ratio, (b) The R' ratio where R' = R/Rmin, (c) The R'' ratio where R'' = (R-Rmin)/(Rmax-Rmin)

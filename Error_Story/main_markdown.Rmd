@@ -1,0 +1,56 @@
+---
+title: "A tale of two errors"
+author: ""
+date: "October 31, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### The origin of the error
+
+There is an error in the recorded measurements at both of your sensor's excitation wavelengths, $\lambda_1$ and $\lambda_2$. 
+
+\
+
+$I_{\lambda_1}$ is off by some factor: $I_{\lambda_1, actual} = I_{\lambda_1} + a$
+
+$I_{\lambda_2}$ is off by some factor: $I_{\lambda_2, actual} = I_{\lambda_2} + b$
+
+\
+
+Let's say your emission of interest, $R$, is measured as $\frac{I_{\lambda_1}}{I_{\lambda_2}}$. And all of your results assume that $R = \frac{I_{\lambda_1}}{I_{\lambda_2}}$, when in fact $R_{actual} = \frac{I_{\lambda_1} + a}{I_{\lambda_2} + b}$. 
+
+\
+
+The actual amount of error in $R$ will depend on $I_{\lambda_1}$ and $I{\lambda_2}$ ($\Delta R = \frac{I_{\lambda_1} + a}{I{\lambda_2} + b} - \frac{I{\lambda_1}}{I_{\lambda_2}}$).But let's define a constant error $c$: $R_{actual} = c * \frac{I_{\lambda_1}}{I_{\lambda_2}}$. Perhaps an estimate of $c$ could be obtained by measuring the variation in measured ratios from a data sample. 
+
+### The error propagating to OxD
+
+First, let's imagine that you have an error of $c = 1.05$. How much will that change the OxD?
+
+
+**TODO: Graph**
+
+But really that error will just shift our graph to the left or right. Think about it: you're at an R of 1 but the actual R is 1.05, so the graph will just shift.
+
+\
+
+That will have the same effect on the graph of E, since it is also plotted with respect to R.
+
+\
+
+But, if $c = 1.05$, how will that effect the other values?
+
+\
+
+Rmin and Rmax will both be changed by $1.05$, so those effects will also just scale the graph horizontally. 
+
+\
+
+The relative contribution of each wavelength $\delta$ will be changed differently, since it is measured entirely in the $\lambda_2$ wavelength:
+
+Assuming that $\lambda_2$ has a constant error regardless of the conditions, $\Delta \delta = \frac{I_{\lambda_2, ox} + a}{I_{\lambda_2, red} + a} - \frac{I_{\lambda_2, ox}}{I_{\lambda_2, red}} = \frac{a(I_{lambda_2, red} - I_{lambda_2, ox})}{I_{lambda_2, red}(I_{lambda_2,red} + a)}$. 
