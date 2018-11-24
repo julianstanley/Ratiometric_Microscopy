@@ -54,3 +54,111 @@ Rmin and Rmax will both be changed by $1.05$, so those effects will also just sc
 The relative contribution of each wavelength $\delta$ will be changed differently, since it is measured entirely in the $\lambda_2$ wavelength:
 
 Assuming that $\lambda_2$ has a constant error regardless of the conditions, $\Delta \delta = \frac{I_{\lambda_2, ox} + a}{I_{\lambda_2, red} + a} - \frac{I_{\lambda_2, ox}}{I_{\lambda_2, red}} = \frac{a(I_{lambda_2, red} - I_{lambda_2, ox})}{I_{lambda_2, red}(I_{lambda_2,red} + a)}$. 
+
+
+### Baseline errors
+
+```{r}
+R <- read.csv("R_vab_11_15_18.csv")
+R_animal1 <- subset(R, R$Strains == 1)
+R_animal2 <- subset(R, R$Strains == 2)
+R_animal1_nomvmt <- subset(R_animal1, R_animal1$Movement == 0)
+R_animal2_nomvmt <- subset(R_animal2, R_animal2$Movement == 0)
+```
+
+Let's look at all of the traces
+```{r}
+y <- c()
+for (pos in 1:100) {
+    y <- c(y, R_animal1[1, pos])
+}
+
+plot(y, ylim = c(0.5,1.5), type = "l")
+
+for (animal in (1:100)) {
+    y <- c()
+    for (pos in 1:100) {
+        y <- c(y, R_animal1[animal, pos])
+    }
+    points(y, type = "l")
+}
+
+```
+
+
+```{r}
+dim(R_animal1_nomvmt)[1]
+dim(R_animal2_nomvmt)[1]
+```
+
+We have 35 of one animal that didn't have any movement, and 22 of another animal that didn't have any movement.
+
+What is the standard error at each position?
+
+```{r}
+# Define standard error
+se <- function(x) sqrt(var(x)/length(x))
+
+# Initalize vector
+errors_animal1 <- c()
+errors_animal2 <- c()
+
+# Loop through positions, add standard error to vector
+for (i in (1:100)) {
+    errors_animal1 <- c(errors_animal1, se(R_animal1_nomvmt[i]))
+    errors_animal2 <- c(errors_animal2, se(R_animal2_nomvmt[i]))
+}
+
+plot(errors_animal1, col = "black", ylim = c(0, 0.2), pch = 20)
+points(errors_animal2, col = "red", pch = 20)
+```
+
+What if we do the same thing for all of the animals?
+
+```{r}
+# Initalize vector
+errors_animal1_all <- c()
+errors_animal2_all <- c()
+
+# Loop through positions, add standard error to vector
+for (i in (1:100)) {
+    errors_animal1_all <- c(errors_animal1_all, se(R_animal1[i]))
+    errors_animal2_all <- c(errors_animal2_all, se(R_animal2[i]))
+}
+
+plot(errors_animal1_all, col = "black", ylim = c(0, 0.2), pch = 20)
+points(errors_animal2_all, col = "red", pch = 20)
+```
+
+Let's take a more extreme value--say, the range. How does that compare?
+
+
+```{r}
+# Initalize vector
+range_animal1 <- c()
+range_animal2 <- c()
+
+# Loop through positions, add standard error to vector
+for (i in (1:100)) {
+    range_animal1 <- c(range_animal1, range(R_animal1_nomvmt[i])[2])
+    range_animal2 <- c(range_animal2, range(R_animal2_nomvmt[i])[2])
+}
+
+plot(range_animal1, col = "black", ylim = c(0, 3), pch = 20)
+points(range_animal2, col = "red", pch = 20)
+```
+
+```{r}
+# Initalize vector
+range_animal1_all <- c()
+range_animal2_all <- c()
+
+# Loop through positions, add standard error to vector
+for (i in (1:100)) {
+    range_animal1_all <- c(range_animal1_all, range(R_animal1[i])[2])
+    range_animal2_all <- c(range_animal2_all, range(R_animal2[i])[2])
+}
+
+plot(range_animal1_all, col = "black", ylim = c(0, 3), pch = 20)
+points(range_animal2_all, col = "red", pch = 20)
+```
