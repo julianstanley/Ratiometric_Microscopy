@@ -1,34 +1,6 @@
 ---
-title: A sensitivity analysis of dual-excitation, single-emission roGFP imaging
-
-author:  |
-  | Julian Stanley $^1$, Javier Apfeld $^1$
-  | $^1$Northeastern University
-
-
-abstract: |
-  Abstract lorem ipsum
-
-
-bibliography:
-csl: 
-
-
 output:
-  bookdown::pdf_document2:
-  toc: no
-fig_caption: yes
-
-
-always_allow_html: yes
-
-
-# These are LaTex settings to take care of floating figures/tables, line spacing, etc
-header-includes:
-  - \usepackage{endfloat}    
-  - \usepackage{setspace}\doublespacing
-  - \usepackage{lineno}
-  - \linenumbers
+    pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -72,7 +44,7 @@ D_E <- function(R, Rmin, Rmax) {
 
 # R
 R_init <- seq(0.667, 5.207, by = 0.0001)
-E_init <- E_OXD(-273, R_init, 0.667, 5.207, 0.171)
+E_init <- E_OXD(-265, R_init, 0.667, 5.207, 0.171)
 E_deriv <- D_E(R_init, 0.667, 5.207)
 E_deriv_norm <- subset(E_deriv/sort(E_deriv)[2], E_deriv/sort(E_deriv)[2] > -Inf & E_deriv/sort(E_deriv)[2] < Inf)
 R_init_s <- subset(R_init, E_deriv/sort(E_deriv)[2] > -Inf & E_deriv/sort(E_deriv)[2] < Inf)
@@ -121,7 +93,7 @@ polygon(c(head(E_deriv_sen_x_p,1),E_deriv_sen_x_p, tail(E_deriv_sen_x_p, 1)), c(
 legend("topright", inset=c(.13,0.05), xpd=TRUE, c("Buffering Zone", "Sensitive Zone"), pch = "-", lwd = 4, col = c("#e1edc9", "#EBBEC5"))
 ```
 
-Note that the electrical potential $E$ is related to $R$ via $E^\circ$ , $R_{min}$, $R_{max}$, and $\delta$: $$E = E^\circ - \frac{-RT}{2F}ln(\frac{1- \frac{R-R_{min}}{(R-R_{min})-\delta(R_{max}-R)}}{\frac{R-Rmin}{(R-R_{min})-\delta(R_{max}-R)}}) = \\ E^\circ - \frac{-RT}{2F}ln(\frac{\delta*(R_{max}-R)}{R-R_{min}})$$.
+Note that the electrical potential $E$ is related to $R$ via $E^\circ$ , $R_{min}$, $R_{max}$, and $\delta$: $$E = E^\circ - \frac{RT}{2F}ln(\frac{1- \frac{R-R_{min}}{(R-R_{min})-\delta(R_{max}-R)}}{\frac{R-Rmin}{(R-R_{min})-\delta(R_{max}-R)}}) = \\ E^\circ - \frac{RT}{2F}ln(\frac{\delta*(R_{max}-R)}{R-R_{min}})$$.
 
 But the derivative of the electrical potential $E$ with respect to $R$ is only dependent on the $R_{min}$ and $R_{max}$:
 $$\frac{\partial E}{\partial R} = \frac{-RT}{2F}*\frac{R_{max}-R_{min}}{(R-R_{min})(R-R_{max})}$$
@@ -134,13 +106,13 @@ fc_red <- colorRampPalette(c("#FC9272", "#DE2D26"))(5)
 fc_blue <- colorRampPalette(c("#BCBDDC", "#756BB1"))(5)
 
 par(pty = "s", mfrow = c(1,2))
-plot(E_OXD(-273, R_init, 0.667, 5.207, 0.171)-E_init~R_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R")
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~R_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R")
 
 sequence <- seq(0.4, 2, by = 0.4)
 
 for(pos in 1:length(sequence)) {
-    suppressWarnings(points(E_OXD(-273, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_red[pos], lwd = 2))
-    suppressWarnings(points(E_OXD(-273, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_blue[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_red[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_blue[pos], lwd = 2))
 }
 
 legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.32,0), xpd=TRUE, as.character(format(c(rev(sequence), -1*sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_red), fc_blue), cex = .75)
@@ -149,12 +121,12 @@ legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.32,0), 
 
 fc_purRed <- colorRampPalette(rev(c("#FC9272", "#DE2D26", "#BCBDDC", "#756BB1")))(11)
 
-plot(E_OXD(-273, R_init, 0.667, 5.207, 0.171)-E_init~R_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given relative error in R")
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~R_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given relative error in R")
 
 sequence <- c(.4, .5, 0.6, 0.7, 0.8, 1, 1.25, 1.428571, 1.666667, 2, 2.5)
 
 for(pos in 1:length(sequence)) {
-    suppressWarnings(points(E_OXD(-273, R_init*sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_purRed[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init*sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_purRed[pos], lwd = 2))
 }
 
 legend("topright", title = expression('R'['obs']/'R'['exp']), inset=c(-0.3,0), xpd=TRUE, as.character(format(rev(sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_purRed)), cex = 0.75)
@@ -166,13 +138,13 @@ legend("topright", title = expression('R'['obs']/'R'['exp']), inset=c(-0.3,0), x
 par(pty = "s", mfrow = c(1,2))
 
 R_init_p <- R_init/0.667
-plot(E_OXD(-273, R_init, 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R'", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R'")
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R'", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R'")
 
 sequence <- seq(0.4, 2, by = 0.4)
 
 for(pos in 1:length(sequence)) {
-    suppressWarnings(points(E_OXD(-273, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_red[pos], lwd = 2))
-    suppressWarnings(points(E_OXD(-273, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_blue[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_red[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_blue[pos], lwd = 2))
 }
 
 legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.32,0), xpd=TRUE, as.character(format(c(rev(sequence), -1*sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_red), fc_blue), cex = 0.75)
@@ -182,12 +154,12 @@ legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.32,0), 
 fc_purRed <- colorRampPalette(rev(c("#FC9272", "#DE2D26", "#BCBDDC", "#756BB1")))(11)
 
 
-plot(E_OXD(-273, R_init, 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given relative error in R'")
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given relative error in R'")
 
 sequence <- c(.4, .5, 0.6, 0.7, 0.8, 1, 1.25, 1.428571, 1.666667, 2, 2.5)
 
 for(pos in 1:length(sequence)) {
-    suppressWarnings(points(E_OXD(-273, R_init*sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_purRed[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init*sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init_p, type = "l", col = fc_purRed[pos], lwd = 2))
 }
 
 legend("topright", title = expression('R'['obs']/'R'['exp']), inset=c(-0.3,0), xpd=TRUE, as.character(format(rev(sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_purRed)), cex = 0.75)
@@ -197,3 +169,314 @@ legend("topright", title = expression('R'['obs']/'R'['exp']), inset=c(-0.3,0), x
 
 
 Following from the math in the previous section, changing the $\delta_\lambda$ of the sensor will have no effect on these graphs. Changing the overall dynamic range will scale the graphs, but the general shape of the plot will stay constant. 
+
+### Errors within biologically meaningful errors in R
+
+The following is assuming that the "biologically relevant region" is between -260 and -280:
+
+```{r, fig.width=8, fig.height=4}
+
+# Values for main R-E plot
+R_init <- seq(0.667, 5.207, by = 0.0001)
+E_init <- E_OXD(-265, R_init, 0.667, 5.207, 0.171)
+values <- data.frame(R_init, E_OXD(-265, R_init, 0.667, 5.207, 0.171))
+values_sig <- subset(values, values[2] > -280 & values[2] < -260)
+
+# Values for derivative
+derivative_init <- D_E(R_init, 0.667, 5.207)
+derivative_init_norm <- subset(derivative_init/sort(derivative_init)[2], derivative_init/sort(derivative_init)[2] > -Inf & derivative_init/sort(derivative_init)[2] < Inf)
+R_init_trim <- subset(R_init, derivative_init/sort(derivative_init)[2] > -Inf & derivative_init/sort(derivative_init)[2] < Inf)
+
+# Relevant zone
+rel_x <- values_sig[1]$R_init
+rel_y <- E_OXD(-265, rel_x, 0.667, 5.207, 0.171)
+rel_y_der <- D_E(rel_x, 0.667, 5.207)/sort(derivative_init)[2]
+
+
+par(pty = "s", mfrow = c(1,2))
+
+# Main R-D
+plot(E_init~R_init, type = "l", ylab = "E", xlab = "R", ylim = c(-350, -180), main = "Relationship between measured \n  value (R) and biological interpretation")
+polygon(c(head(rel_x,1),rel_x, tail(rel_x, 2)[1]), c(-356, rel_y, -356), col = '#1b9e77')
+legend("topright", inset=c(.18,0.05), xpd=TRUE, c("Relevant region"), pch = "-", lwd = 4, col = c("#1b9e77"))
+
+# Derivative
+plot(derivative_init_norm~R_init_trim, type = "l", ylab = "E Sensitivity (Normalized)", xlab = "R", ylim = c(1, 1000), main = "Sensitivity of biological interpretation \n to change in measured value (R)", log = 'y')
+polygon(c(head(rel_x,1),rel_x, tail(rel_x, 2)[1]), c(1, rel_y_der, 1), col = '#1b9e77')
+legend("topright", inset=c(.13,0.05), xpd=TRUE, c("Relevant region"), pch = "-", lwd = 4, col = c("#1b9e77"))
+
+# By the way
+print(paste("The biologically relevant values of R range from", min(values_sig$R_init), "to", max(values_sig$R_init)))
+```
+
+
+Based roughly on the response to reviewers, 95% confidence intervals in R seem to be on the order of ~0.1. With that level of accuracy, how much error in R can we expect?
+
+```{r, fig.width=8, fig.height=4}
+fc_red <- colorRampPalette(c("#FC9272", "#DE2D26"))(5)
+fc_blue <- colorRampPalette(c("#BCBDDC", "#756BB1"))(5)
+
+par(pty = "s", mfrow = c(1,2))
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~R_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "R", xlim=c(0.8, 1.6), ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R")
+
+sequence <- seq(0.05, 0.2, by = 0.05)
+
+for(pos in 1:length(sequence)) {
+    suppressWarnings(points(E_OXD(-265, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_red[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~R_init, type = "l", col = fc_blue[pos], lwd = 2))
+}
+
+legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.35,0), xpd=TRUE, as.character(format(c(rev(sequence), -1*sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_red), fc_blue), cex = .75)
+
+# In terms of E
+
+plot(E_OXD(-265, R_init, 0.667, 5.207, 0.171)-E_init~E_init, type = "l", ylab = expression(paste('E'['obs']-'E'['exp'], " (mV)")), xlab = "E (mV)", xlim=c(-300, -200), ylim = c(-30,30), col = "black", lwd = 2, main = "Error in E \n given absolute error in R")
+
+sequence <- seq(0.05, 0.2, by = 0.05)
+
+for(pos in 1:length(sequence)) {
+    suppressWarnings(points(E_OXD(-265, R_init+sequence[pos], 0.667, 5.207, 0.171)-E_init~E_init, type = "l", col = fc_red[pos], lwd = 2))
+    suppressWarnings(points(E_OXD(-265, R_init-sequence[pos], 0.667, 5.207, 0.171)-E_init~E_init, type = "l", col = fc_blue[pos], lwd = 2))
+}
+
+legend("topright", title = expression('R'['obs']-'R'['exp']), inset=c(-0.35,0), xpd=TRUE, as.character(format(c(rev(sequence), -1*sequence), digits=1)), pch = "-", lwd = 4, col = c(rev(fc_red), fc_blue), cex = .75)
+```
+
+Using the model above, a redox value between -268 mV and -271 mV with an error in R of +/-0.1 should have an average error in E of 2.69, consistent with the observed confidence intervals. However, the variation between individuals of up to 12mv could be explained by errors in R around +/-0.5.
+
+
+
+### Generalizing for sensor characteristics
+
+Let's take a plot of the normalized deriviative of E for sensors with different qualities and plot that on a graph with E on the x axis (instead of R). 
+
+Let's say we're interested in the region of E between -260 and -280. And let's consider 3 sensors:
+
+1) E0 = -265, Rmin = 0.667, Rmax = 5.207,delta = .171
+2) E0 = -270, Rmin = 1, Rmax = 2, delta = 1 -- Midpoint potential in our range, but low dynamic range
+3) E0 - -290, Rmin = 1, Rmax = 12, delta = 1 -- Midpoint potential not in our range, but high dynamic range
+4) E0 - -290, Rmin = 1, Rmax = 12, delta = 3 -- Same as 3, but higher delta
+5) E0 - -290, Rmin = 1, Rmax = 12, delta = 0.1 -- Same as 3, but lower delta
+
+```{r, fig.width=8, fig.height=4}
+# Setup
+E0_1 <- -265
+E0_2 <-  -270
+E0_3 <-  -290
+E0_4 <-  -290
+E0_5 <-  -290
+
+Rmin_1 <-  0.667
+Rmin_2 <-  1
+Rmin_3 <-  1
+Rmin_4 <-  1
+Rmin_5 <-  1
+
+Rmax_1 <-  5.207
+Rmax_2 <-  2
+Rmax_3 <-  12
+Rmax_4 <-  12
+Rmax_5 <-  12
+
+Delta_1 <-  .171
+Delta_2 <-  1
+Delta_3 <-  1
+Delta_4 <-  3
+Delta_5 <-  0.1
+
+range <- c(-280, -260)
+
+# Values for main R-E plot
+R_1 <- seq(Rmin_1, Rmax_1, by = 0.0001)
+R_2 <- seq(Rmin_2, Rmax_2, by = 0.0001)
+R_3 <- seq(Rmin_3, Rmax_3, by = 0.0001)
+R_4 <- seq(Rmin_4, Rmax_4, by = 0.0001)
+R_5 <- seq(Rmin_5, Rmax_5, by = 0.0001)
+
+E_1 <- E_OXD(E0_1, R_1, Rmin_1, Rmax_1, Delta_1)
+E_2 <- E_OXD(E0_2, R_2, Rmin_2, Rmax_2, Delta_2)
+E_3 <- E_OXD(E0_3, R_3, Rmin_3, Rmax_3, Delta_3)
+E_4 <- E_OXD(E0_4, R_4, Rmin_4, Rmax_4, Delta_4)
+E_5 <- E_OXD(E0_5, R_5, Rmin_5, Rmax_5, Delta_5)
+
+
+# Values for derivative
+d_1 <- D_E(R_1, Rmin_1, Rmax_1)
+d_2 <- D_E(R_2, Rmin_2, Rmax_2)
+d_3 <- D_E(R_3, Rmin_3, Rmax_3)
+d_4 <- D_E(R_4, Rmin_4, Rmax_4)
+d_5 <- D_E(R_5, Rmin_5, Rmax_5)
+
+d_1_norm <- subset(d_1/sort(d_1)[2], d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+d_2_norm <- subset(d_2/sort(d_2)[2], d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+d_3_norm <- subset(d_3/sort(d_3)[2], d_3/sort(d_3)[2] > -Inf & d_3/sort(d_3)[2] < Inf)
+d_4_norm <- subset(d_4/sort(d_4)[2], d_3/sort(d_4)[2] > -Inf & d_4/sort(d_4)[2] < Inf)
+d_5_norm <- subset(d_5/sort(d_5)[2], d_5/sort(d_5)[2] > -Inf & d_5/sort(d_5)[2] < Inf)
+
+
+R_1_trim <- subset(R_1,  d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+R_2_trim <- subset(R_2,  d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+R_3_trim <- subset(R_3,  d_3/sort(d_3)[2] > -Inf & d_3/sort(d_3)[2] < Inf)
+R_4_trim <- subset(R_4,  d_4/sort(d_4)[2] > -Inf & d_4/sort(d_4)[2] < Inf)
+R_5_trim <- subset(R_5,  d_5/sort(d_5)[2] > -Inf & d_5/sort(d_5)[2] < Inf)
+
+E_1_trim <- subset(E_1,  d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+E_2_trim <- subset(E_2,  d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+E_3_trim <- subset(E_3,  d_3/sort(d_3)[2] > -Inf & d_3/sort(d_3)[2] < Inf)
+E_4_trim <- subset(E_4,  d_4/sort(d_4)[2] > -Inf & d_4/sort(d_4)[2] < Inf)
+E_5_trim <- subset(E_5,  d_5/sort(d_5)[2] > -Inf & d_5/sort(d_5)[2] < Inf)
+
+# Relevant zone
+# rel_x <- values_sig[1]$R_init
+# rel_y <- E_OXD(-265, rel_x, 0.667, 5.207, 0.171)
+# rel_y_der <- D_E(rel_x, 0.667, 5.207)/sort(derivative_init)[2]
+
+
+par(pty = "s", mfrow = c(1,2))
+
+# Main R-D
+plot(E_1~R_1, type = "l", ylab = "E", xlab = "R", ylim = c(-350, -180), xlim = c(0, 12), main = "Relationship between measured \n  value (R) and biological interpretation", col = "#66c2a5")
+points(E_2~R_2, type = "l", col = "#fc8d62")
+points(E_3~R_3, type = "l", col = "#8da0cb")
+points(E_4~R_4, type = "l", col = "#a8b6d7")
+points(E_5~R_5, type = "l", col = "#cbd3e7")
+#polygon(c(head(rel_x,1),rel_x, tail(rel_x, 2)[1]), c(-356, rel_y, -356), col = '#1b9e77')
+legend("topright", inset=c(-.3,0.0), xpd=TRUE, c("1", "2", "3", "4", "5"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62", "#8da0cb", "#a8b6d7", "#cbd3e7"))
+
+# Derivative
+plot(d_1~E_1, type = "l", ylab = "E Sensitivity (Unnormalized)", xlab = "E", ylim = c(1, 1000), xlim =c(-350, -180) , main = "Sensitivity of biological interpretation \n to change in measured value (R)", col = "#66c2a5")
+points(d_2~E_2, type = "l", col = "#fc8d62")
+points(d_3~E_3, type = "l", col = "#8da0cb")
+points(d_4~E_4, type = "l", col = "#a8b6d7")
+points(d_5~E_5, type = "l", col = "#cbd3e7")
+
+#legend("center",inset=c(0, -1), xpd=TRUE, c("1", "2", "3"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62", "#8da0cb"))
+#polygon(c(head(rel_x,1),rel_x, tail(rel_x, 2)[1]), c(1, rel_y_der, 1), col = '#1b9e77')
+#legend("topright", inset=c(.13,0.05), xpd=TRUE, c("Relevant region"), pch = "-", lwd = 4, col = c("#1b9e77"))
+```
+
+Replotting the derivative within the relevant range:
+
+```{r}
+par(pty = "s", mfrow = c(1,1))
+
+# Derivative
+plot(d_1~E_1, type = "l", ylab = "E Sensitivity (Unnormalized)", xlab = "E", ylim = c(0, 80), xlim =range , main = "Sensitivity of biological interpretation \n to change in measured value (R)", col = "#66c2a5")
+points(d_2~E_2, type = "l", col = "#fc8d62")
+points(d_3~E_3, type = "l", col = "#8da0cb")
+points(d_4~E_4, type = "l", col = "#a8b6d7")
+points(d_5~E_5, type = "l", col = "#cbd3e7")
+
+legend("topright", inset=c(-.3,0.0), xpd=TRUE, c("1", "2", "3", "4", "5"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62", "#8da0cb", "#a8b6d7", "#cbd3e7"))
+
+```
+
+We can show that, for this range of E values, the sensor with the large dynamic range performs with the lowest sensitivity, even though its midpoint potential is furthest from the center of our biologically-relevant range 
+
+But notice that, in this view, delta does matter. Delta changes the mapping of R values to E values and therefore, while it does not change the sensitivity of E at any given R, it changes the E value that corresponds to that R. 
+
+The sensor has minimal error at the point where OxD is 0.5. Changing the delta value can change the voltage level at which that point occurs. Notice that, we if zoom out of the previous graph, you can see that the minimum sensitivity changes between sensors 1, 2, and {3,4,5}, but the changes in delta just translate the curve along the horizontal axis:
+
+```{r}
+par(pty = "s", mfrow = c(1,1))
+
+# Derivative
+plot(d_1~E_1, type = "l", ylab = "E Sensitivity (Unnormalized)", xlab = "E", ylim = c(0, 80), xlim =c(-350, -180) , main = "Sensitivity of biological interpretation \n to change in measured value (R)", col = "#66c2a5")
+points(d_2~E_2, type = "l", col = "#fc8d62")
+points(d_3~E_3, type = "l", col = "#8da0cb")
+points(d_4~E_4, type = "l", col = "#a8b6d7")
+points(d_5~E_5, type = "l", col = "#cbd3e7")
+
+legend("topright", inset=c(-.3,0.0), xpd=TRUE, c("1", "2", "3", "4", "5"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62", "#8da0cb", "#a8b6d7", "#cbd3e7"))
+
+```
+
+From earlier, we know that $$E^\circ - \frac{RT}{2F}ln(\frac{\delta*(R_{max}-R)}{R-R_{min}})$$. 
+
+And we know that the minimum error occurs when $R = \frac{R_{max}+R_{min}}{2}$
+
+We can also approximate $\frac{RT}{2F} = 12.71$ at our conditions
+
+So, for example, the minimum error for Sensor 3, 4, and 5 is  $$-290 - 12.71ln(\frac{\delta*(12-6.5)}{6.5-1})$$. 
+
+When $\delta = 1$, like in Sensor 3, then $$-290 - 12.71ln(\frac{1*(12-6.5)}{6.5-1}) = -290 - 12.71ln(1)  = -290mV$$ 
+
+Generalizing, any delta changes the midpoint by a scale of $ln(\delta)*\frac{RT}{2F} = ln(\delta)*12.71$
+
+So we would expect that changing the delta to 3, as we did with sensor 4, would decrease point of minimum error by $ln(3) * 12.71 = 13.96 mV$
+
+And sure enough $-290 - 12.71ln(\frac{3*(12-6.5)}{6.5-1}) = -303.96mV = -290 - 13.96$
+
+So, if you could create a sensor with any properties, you would: (1) Make a sensor with the greatest possible dynamic range possible, with a midpoint potential somewhere in the range of the desired values to be measured (2) Tweak the $\delta$ of that sensor so that the minimum error falls in the midpoint of the desired values to be measured.
+
+In practice when comparing sensors, we can just compare integrative sensitivities of voltage over the range of voltage values that we want to measure. 
+
+
+If the above is true, then two sensors should have the exact same error profiles if they have the same characteristics except for: (1) The E values are different by a $12.71 * ln(*3*)$ and (2) The delta values are different by a factor of *3* 
+
+This appears to be true. Let's look at two sensors that each have an Rmin of 1, Rmax of 6, but an E0 of -270 and -256 and a delta of 1 and 3 for sensor 1 and 2, respectively: 
+
+```{r, fig.width=8, fig.height=4}
+# Setup
+E0_1 <- -270
+E0_2 <-  -256
+
+
+Rmin_1 <-  1
+Rmin_2 <-  1
+
+
+Rmax_1 <-  6
+Rmax_2 <-  6
+
+
+Delta_1 <-  1
+Delta_2 <-  3
+
+range <- c(-280, -260)
+
+# Values for main R-E plot
+R_1 <- seq(Rmin_1, Rmax_1, by = 0.0001)
+R_2 <- seq(Rmin_2, Rmax_2, by = 0.0001)
+
+
+E_1 <- E_OXD(E0_1, R_1, Rmin_1, Rmax_1, Delta_1)
+E_2 <- E_OXD(E0_2, R_2, Rmin_2, Rmax_2, Delta_2)
+
+
+
+# Values for derivative
+d_1 <- D_E(R_1, Rmin_1, Rmax_1)
+d_2 <- D_E(R_2, Rmin_2, Rmax_2)
+
+
+d_1_norm <- subset(d_1/sort(d_1)[2], d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+d_2_norm <- subset(d_2/sort(d_2)[2], d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+
+
+
+R_1_trim <- subset(R_1,  d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+R_2_trim <- subset(R_2,  d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+
+
+E_1_trim <- subset(E_1,  d_1/sort(d_1)[2] > -Inf & d_1/sort(d_1)[2] < Inf)
+E_2_trim <- subset(E_2,  d_2/sort(d_2)[2] > -Inf & d_2/sort(d_2)[2] < Inf)
+
+# Relevant zone
+# rel_x <- values_sig[1]$R_init
+# rel_y <- E_OXD(-265, rel_x, 0.667, 5.207, 0.171)
+# rel_y_der <- D_E(rel_x, 0.667, 5.207)/sort(derivative_init)[2]
+
+
+par(pty = "s", mfrow = c(1,2))
+
+# Derivative
+plot(d_1~E_1, type = "l", ylab = "E Sensitivity", xlab = "E", ylim = c(1, 1000), xlim =c(-350, -180) , main = "Sensitivity of Sensor 1", col = "#66c2a5")
+plot(d_2~E_2, type = "l", ylab = "E Sensitivity", xlab = "E", ylim = c(1, 1000), xlim =c(-350, -180) , main = "Sensitivity of Sensor 2", col = "#fc8d62")
+
+#legend("topright", inset=c(-.3,0.0), xpd=TRUE, c("1", "2"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62"))
+
+#legend("center",inset=c(0, -1), xpd=TRUE, c("1", "2", "3"), pch = "-", lwd = 4, col = c("#66c2a5", "#fc8d62", "#8da0cb"))
+#polygon(c(head(rel_x,1),rel_x, tail(rel_x, 2)[1]), c(1, rel_y_der, 1), col = '#1b9e77')
+#legend("topright", inset=c(.13,0.05), xpd=TRUE, c("Relevant region"), pch = "-", lwd = 4, col = c("#1b9e77"))
+```
