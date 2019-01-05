@@ -1,9 +1,9 @@
 ---
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r colors}
@@ -150,7 +150,7 @@ Rmax <- 5
 R <- seq(Rmin, Rmax, by = 0.001)
 
 # Setup plot frame
-par(pty = 's', mfrow = c(1,2), mai = c(0.2, 0.8, 0.2, 1.0))
+par(pty = 's', mfrow = c(1,2), mai = c(0.2, 0.9, 0.2, 1.0))
 
 # Plot OxD---------------------
 # Generate values of OxD
