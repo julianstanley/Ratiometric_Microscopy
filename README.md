@@ -24,16 +24,5 @@ This is the main repository for the analysis of ratiometric sensors. As this pro
 
 ![Alt: GIF of visualization shiny app](https://media.giphy.com/media/OQ4Y9lq6azC6sxi1qO/giphy.gif)
 
-
-
-
-
-
-
-
-
-
-
-=======
-This is a repository for all of my analysis on Ratiometric Microscopy, beginning in the fall of 2018. For more organized projects, take a look at the associated R package (RatioTools). 
+ 
 
