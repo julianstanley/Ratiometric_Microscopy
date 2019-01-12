@@ -1,5 +1,5 @@
 ---
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -181,9 +181,27 @@ for (i in 2:length(deltas)) {
 }
 ```
 
-**Figure 1**. Measured ratio values of $R$ can be converted to the fraction oxidized $OxD$ or the redox potential $E$. This figure is plotted based on a hypothetical sensor with $\{R_{min}, R_{max}, E^\circ\} = \{1, 5, -270 mV\}$. The parameter $\delta_{470}$ changes the linearity of the map to $OxD$, whereas it changes the adjusted midpoint potential of the map to $E$
+**Figure 1**. Measured ratio values of $R$ can be converted to the fraction oxidized $OxD$ or the redox potential $E$. This figure is plotted based on a hypothetical sensor with $\{R_{min}, R_{max}, E^\circ\} = \{1, 5, -270 mV\}$. The parameter $\delta_{470}$ changes the linearity of the map to $OxD$, whereas it changes the effective midpoint potential of the map to $E$
 
 
+We can talk about the effective midpoint potential as a function of $\delta_{470}$ such that $E^\circ_{eff} = E^\circ - \frac{R_{gas}T}{2F}ln(\delta_{470)})$
+
+```{r}
+Eeff <- function(delta_470, e0) {
+    return (
+        e0 - 12.71 * log(delta_470)
+    )
+}
+
+
+
+deltas <- c(exp(c(-5, 5)))
+
+par(pty = 's')
+
+
+plot(Eeff(deltas, -270) ~ log(deltas), ylab = "E_effective",type = 'l',bty ="L", main = "", ylim = c(-330, -200), cex.axis = cex.axis, cex.lab = cex.lab)
+```
 
 ## Sensitivity analysis
 
