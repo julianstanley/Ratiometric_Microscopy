@@ -1,5 +1,5 @@
 ---
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -118,9 +118,34 @@ D_E <- function(R, Rmin, Rmax) {
         (-12.71*(Rmax-Rmin))/((R-Rmin)*(R-Rmax))
     )
 }
+
+# Define a percent error
+Error_E <- function(R, Rmin, Rmax, delta, e0, percent_error) {
+    answer <- c()
+        for (Rind in R) {
+            if((Rind * (1 - percent_error/100) >= Rmin) && (Rind * (1 + percent_error/100) <= Rmax)) {
+                err <- max(
+                abs(E(R = Rind, e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta) 
+                    - E(R = Rind * (1 + percent_error/100), e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta)),
+                abs(E(R = Rind, e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta) 
+                    - E(R = Rind * (1 - percent_error/100), e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta))
+                )
+                answer <- c(answer, err)
+            }
+            
+            else {
+            
+            answer <- c(answer, Inf)
+            
+            }
+        }
+        
+    return(answer)
+    
+}
 ```
 
-```{r helper}
+```{r combine-helper}
 # Turn two pairs of lambda-emission spectra into a 3-column dataframe
 combine <- function(ox_lambda, ox_value, red_lambda, red_value) {
     start <- max(ox_lambda[1], red_lambda[1])
@@ -200,9 +225,12 @@ initSensor <- function(sensor_data, lambda_1, lambda_2, e0) {
     OxD_sen <- D_OXD(R = R, Rmin = Rmin, Rmax = Rmax, delta = delta)
     E_sen <- D_E(R = R, Rmin = Rmin, Rmax = Rmax)
     
+    # Generate 5% errors
+    Error5 <- Error_E(R = R, Rmin = Rmin, Rmax = Rmax, delta = delta, e0 = e0, percent_error = 5) 
+    
     # Return the final list
     return(list(data = combine(ox_lambda, ox_value, red_lambda, red_value), e0 = e0, Eeff = Eeff(delta_470 = delta, e0 = e0),
-                OxD_sen = OxD_sen, E_sen = E_sen,
+                OxD_sen = OxD_sen, E_sen = E_sen, Error5 = Error5,
                 delta = delta, Rmin = Rmin, Rmax = Rmax, R = R, OxD = OxD_values, E = E_values, 
                 RPrime = RPrime, RDoublePrime = RDoublePrime))
 }
@@ -246,10 +274,10 @@ legend("topleft", xpd=TRUE, c("Oxidized", "Reduced"), pch = "-", lwd = 4, col = 
 par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
 
 gfp1_deltas <- gfp1_prop$data$ox/gfp1_prop$data$red
-plot(gfp1_deltas ~ gfp1_prop$data$lambda, type = 'l', col = 'black', main = "Lambda profile of roGFP1", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
+plot(gfp1_deltas ~ gfp1_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of roGFP1", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
 
 gfp2_deltas <- gfp2_prop$data$ox/gfp2_prop$data$red
-plot(gfp2_deltas ~ gfp2_prop$data$lambda, type = 'l', col = 'black', main = "Lambda profile of roGFP2", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
+plot(gfp2_deltas ~ gfp2_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of roGFP2", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
       
 values <- (data.frame(
     c("Delta ~ 1", "Delta minimized", "Delta maximized"),
@@ -396,3 +424,20 @@ legend("top", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = 
 ```
 
 ## Sensitivity given 5% error in R
+```{r, fig.align='center', fig.height = 5, fig.width = 10}
+par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+
+plot(gfp1_max_prop$E ~ gfp1_max_prop$Error5, type = 'l', xlim = c(0, 20), ylim = c(-350, -150), col = colors4[2], lwd = 2, bty = 'l', xlab = "Minimum Error", ylab = expression(E[GSH]))
+points(gfp1_iso_prop$E ~ gfp1_iso_prop$Error5, type = 'l', col = colors4[1], lwd = 2)
+points(gfp2_max_prop$E ~ gfp2_max_prop$Error5, type = 'l', col = colors4[3], lwd = 2)
+points(gfp2_iso_prop$E ~ gfp2_iso_prop$Error5, type = 'l', col = colors4[4], lwd = 2)
+
+legend("top", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+
+plot(min(gfp1_max_prop$Error5) ~ I(gfp1_max_prop$Rmax/gfp1_max_prop$Rmin), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(0, 40), ylab = "Minimum Error (mV)", xlab = expression(R[Max]/R[Min]))
+points(min(gfp1_iso_prop$Error5) ~ I(gfp1_iso_prop$Rmax/gfp1_iso_prop$Rmin), col = colors4[1],pch = 16, cex = 2)
+points(min(gfp2_max_prop$Error5) ~ I(gfp2_max_prop$Rmax/gfp2_max_prop$Rmin), col = colors4[3],pch = 16, cex = 2)
+points(min(gfp2_iso_prop$Error5) ~ I(gfp2_iso_prop$Rmax/gfp2_iso_prop$Rmin), col = colors4[4],pch = 16, cex = 2)
+
+legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+```
