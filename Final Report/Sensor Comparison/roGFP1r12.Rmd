@@ -1,5 +1,6 @@
 ---
-output: html_notebook
+output:
+  pdf_document: default
 ---
 
 
@@ -247,199 +248,152 @@ gfp1r12_dat <- read.csv("rogfp1r12.csv", header = FALSE, stringsAsFactors = FALS
 gfp1r12_e0 <-  -265
 
 # Get other properties
-gfp1r12_prop <- initSensor(gfp1r12_dat, c(390, 410), c(470, 480), gfp1r12_e0)
+gfp1r12_prop <- initSensor(gfp1r12_dat, c(400, 420), c(460, 480), gfp1r12_e0)
 ```
 
 ## Excitation-emission profiles
 
-```{r Plot spectra, fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+```{r Plot spectra, fig.align='center', fig.height = 5, fig.width = 5}
+#png("rogfp1r12_spectra.jpg")
 
-plot(gfp1r12_prop$data$ox ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of GFP1R12", xlab = expression(lambda), ylab = "Emission (relative)", bty = 'L')
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+
+plot(gfp1r12_prop$data$ox ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
 points(gfp1r12_prop$data$red ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[2])
 
 legend("topright", xpd=TRUE, c("Oxidized", "Reduced"), pch = "-", lwd = 4, col = c(coolwarm(2)), cex = 1)
 
+
+#dev.off()
 ```
 
 ## Delta profiles
-```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 
-gfp1_deltas <- gfp1_prop$data$ox/gfp1_prop$data$red
-plot(gfp1_deltas ~ gfp1_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of roGFP1", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
+gfp1r12_deltas <- gfp1r12_prop$data$ox/gfp1r12_prop$data$red
+plot(gfp1r12_deltas ~ gfp1r12_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of roGFP1-R12", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
 
-gfp2_deltas <- gfp2_prop$data$ox/gfp2_prop$data$red
-plot(gfp2_deltas ~ gfp2_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of roGFP2", xlab = expression(lambda), ylab = expression(delta), bty = 'L')
       
 values <- (data.frame(
     c("Delta ~ 1", "Delta minimized", "Delta maximized"),
     
-    c(gfp1_prop$data$lambda[which.min(abs(gfp1_deltas - 1))],
-      gfp1_prop$data$lambda[which.min(gfp1_deltas)],
-      gfp1_prop$data$lambda[which.max(gfp1_deltas)]),
+    c(gfp1r12_prop$data$lambda[which.min(abs(gfp1r12_deltas - 1))],
+      gfp1r12_prop$data$lambda[which.min(gfp1r12_deltas)],
+      gfp1r12_prop$data$lambda[which.max(gfp1r12_deltas)])
     
-    c(gfp2_prop$data$lambda[which.min(abs(gfp2_deltas - 1))],
-      gfp2_prop$data$lambda[which.min(gfp2_deltas)],
-      gfp2_prop$data$lambda[which.max(gfp2_deltas) + 
-                                (length(gfp2_deltas) -
-                                     length(subset(gfp2_deltas, gfp2_prop$data$lambda >= 380)))])
     ))
 
-colnames(values) <- c("Characteristic", "GFP1", "GFP2")
-knitr::kable(values, caption = "Approximate delta-wavelength values for GFP1 and GFP2 sensors. For roGFP2, excluded all wavelengths below 380nm")
+colnames(values) <- c("Characteristic", "GFP1-R12")
+knitr::kable(values, caption = "Approximate delta-wavelength values for GFP1-R12")
 ```
 
 Choose two sets of wavelengths for each sensor.
 
-For GFP1: 
+For GFP1-R12: 
 
-* Use $\frac{380 +/- 5 nm}{435 +/- 5 nm}$ for isobestic
-* Use $\frac{380 +/- 5 nm}{460 +/- 5 nm}$ for maximum total dynamic range
+* Use $\frac{410 +/- 5 nm}{425 +/- 5 nm}$ for isobestic
+* Use $\frac{410 +/- 5 nm}{470 +/- 5 nm}$ for maximum total dynamic range
 
-For GFP2:
-
-* Use $\frac{380/- 5 nm}{425 +/- 5 nm}$ for isobestic
-* Use $\frac{380 +/- 5 nm}{450 +/- 5 nm}$ for maximum total dynamic range
 
 
 
 ```{r Initalize two sets of roGFP1 and roGFP2}
-# Set known midpoint potentials
-gfp1_e0 <-  -288
-gfp2_e0 <- -272
 
 # Get other properties
-gfp1_iso_prop <- initSensor(gfp1_dat, c(375, 385), c(430, 440), gfp1_e0)
-gfp1_max_prop <- initSensor(gfp1_dat, c(375, 385), c(455, 465), gfp1_e0)
-
-gfp2_iso_prop <- initSensor(gfp2_dat, c(375, 385), c(420, 430), gfp2_e0)
-gfp2_max_prop <- initSensor(gfp2_dat, c(375, 385), c(445, 455), gfp2_e0)
-
+gfp1r12_iso_prop <- initSensor(gfp1r12_dat, c(400, 420), c(415, 435), gfp1r12_e0)
+gfp1r12_max_prop <- initSensor(gfp1r12_dat, c(400, 420), c(460, 480), gfp1r12_e0)
 
 # Print some properties
 values <- (data.frame(
     c("Delta", "Rmin", "Rmax", "E0", "Adjusted E0",
-      "Dynamic Range", "Fold Change"), 
+      "Rmax-Rmin", "Rmax/Rmin"), 
     
-    c(round(gfp1_iso_prop$delta, 1),
-      round(gfp1_iso_prop$Rmin, 1),
-      round(gfp1_iso_prop$Rmax, 1),
-      gfp1_e0,
-      round(Eeff(gfp1_iso_prop$delta, gfp1_e0), 1),
-      round(gfp1_iso_prop$Rmax - gfp1_iso_prop$Rmin, 1), 
-      round(gfp1_iso_prop$Rmax/gfp1_iso_prop$Rmin, 1)),
+    c(round(gfp1r12_iso_prop$delta, 1),
+      round(gfp1r12_iso_prop$Rmin, 1),
+      round(gfp1r12_iso_prop$Rmax, 1),
+      gfp1r12_e0,
+      round(Eeff(gfp1r12_iso_prop$delta, gfp1r12_e0), 1),
+      round(gfp1r12_iso_prop$Rmax - gfp1r12_iso_prop$Rmin, 1), 
+      round(gfp1r12_iso_prop$Rmax/gfp1r12_iso_prop$Rmin, 1)),
     
-    c(round(gfp1_max_prop$delta, 1), 
-      round(gfp1_max_prop$Rmin, 1),
-      round(gfp1_max_prop$Rmax, 1),
-      gfp1_e0, 
-      round(Eeff(gfp1_max_prop$delta, gfp1_e0), 1),
-      round(gfp1_max_prop$Rmax - gfp1_max_prop$Rmin, 1), 
-      round(gfp1_max_prop$Rmax/gfp1_max_prop$Rmin, 1)),
-    
-    c(round(gfp2_iso_prop$delta, 1), 
-      round(gfp2_iso_prop$Rmin, 2), 
-      round(gfp2_iso_prop$Rmax, 1), 
-      gfp2_e0, 
-      round(Eeff(gfp2_iso_prop$delta, gfp2_e0), 1),
-      round(gfp2_iso_prop$Rmax - gfp2_iso_prop$Rmin, 1), 
-      round(gfp2_iso_prop$Rmax/gfp2_iso_prop$Rmin, 1)),
-    
-    c(round(gfp2_max_prop$delta, 1), 
-      round(gfp2_max_prop$Rmin, 2), 
-      round(gfp2_max_prop$Rmax, 1),
-      gfp2_e0, 
-      round(Eeff(gfp2_max_prop$delta, gfp2_e0), 1),
-      round(gfp2_max_prop$Rmax - gfp2_max_prop$Rmin, 1), 
-      round(gfp2_max_prop$Rmax/gfp2_max_prop$Rmin, 1))
+    c(round(gfp1r12_max_prop$delta, 1), 
+      round(gfp1r12_max_prop$Rmin, 1),
+      round(gfp1r12_max_prop$Rmax, 1),
+      gfp1r12_e0, 
+      round(Eeff(gfp1r12_max_prop$delta, gfp1r12_e0), 1),
+      round(gfp1r12_max_prop$Rmax - gfp1r12_max_prop$Rmin, 1), 
+      round(gfp1r12_max_prop$Rmax/gfp1r12_max_prop$Rmin, 1))
     ))
 
-colnames(values) <- c("Characteristic", "GFP1 Isobestic", "GFP1 Max", "GFP2 Isobestic", "GFP2 Max")
-knitr::kable(values, caption = "Characteristics of GFP1 and GFP2 sensors")
+colnames(values) <- c("Characteristic", "GFP1 Isobestic", "GFP1 Max")
+knitr::kable(values, caption = "Characteristics of GFP1-R12sensors")
 ```
 
-```{r Characterize E0 and delta, fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 1.1, 0.4, 0.8))
-plot(gfp1_max_prop$Eeff - gfp1_max_prop$e0 ~ log(gfp1_max_prop$delta), ylim = c(-30, 30), xlim = c(-2, 2), col = colors4[2],pch = 16, cex = 2, ylab = expression('E'^'0' - 'E'['eff']), xlab = expression(ln(delta)), main = "Delta determines deviation from midpoint")
-points(gfp1_iso_prop$Eeff - gfp1_iso_prop$e0 ~ log(gfp1_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
-points(gfp2_max_prop$Eeff - gfp2_max_prop$e0 ~ log(gfp2_max_prop$delta), col= colors4[3],pch = 16, cex = 2)
-points(gfp2_iso_prop$Eeff - gfp2_iso_prop$e0 ~ log(gfp2_iso_prop$delta), col = colors4[4],pch = 16, cex = 2)
+```{r Characterize E0 and delta, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 1.1, 0.4, 0.8))
+plot(gfp1r12_max_prop$Eeff - gfp1r12_max_prop$e0 ~ log(gfp1r12_max_prop$delta), ylim = c(-30, 30), xlim = c(-2, 2), col = colors4[2],pch = 16, cex = 2, ylab = expression('E'^'0' - 'E'['eff']), xlab = expression(ln(delta)), main = "Delta determines deviation from midpoint")
+points(gfp1r12_iso_prop$Eeff - gfp1r12_iso_prop$e0 ~ log(gfp1r12_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
 
 
 deltas <- seq(exp(-2), exp(2))
 lines(lowess(Eeff(deltas, 300) - 300 ~ log(deltas)), col = "black")
 
-legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso", 'RT/2F'), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4], 'black'), cex = 1)
+legend("topright", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso", 'RT/2F'), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], 'black'), cex = 1)
 
-plot((gfp1_max_prop$Rmax-gfp1_max_prop$Rmin) ~ log(gfp1_max_prop$delta), ylim = c(0, 30), xlim = c(-2, 2), col = colors4[2],pch = 16, cex = 2, ylab = expression(R[max]-R[min]), xlab = expression(ln(delta)), main = "Delta alters dynamic range")
-points((gfp1_iso_prop$Rmax-gfp1_iso_prop$Rmin) ~ log(gfp1_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
-points((gfp2_max_prop$Rmax-gfp2_max_prop$Rmin) ~ log(gfp2_max_prop$delta), col= colors4[3],pch = 16, cex = 2)
-points((gfp2_iso_prop$Rmax-gfp2_iso_prop$Rmin) ~ log(gfp2_iso_prop$delta), col = colors4[4],pch = 16, cex = 2)
+plot((gfp1r12_max_prop$Rmax-gfp1r12_max_prop$Rmin) ~ log(gfp1r12_max_prop$delta), ylim = c(0, 30), xlim = c(-2, 2), col = colors4[2],pch = 16, cex = 2, ylab = expression(R[max]-R[min]), xlab = expression(ln(delta)), main = "Delta alters dynamic range")
+points((gfp1r12_iso_prop$Rmax-gfp1r12_iso_prop$Rmin) ~ log(gfp1r12_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
 
 
-
-legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+legend("topright", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
 
 ```
 
 ## Fraction oxidized and redox potential
-```{r OxD and E, fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
-plot(gfp2_max_prop$OxD ~ gfp2_max_prop$RDoublePrime, type = 'l', col = colors4[3], lwd = 2, bty = 'l', xlab = "R''", ylab = "Fraction of sensors oxidized", main = "Normalized R -> fraction oxidized")
-points(gfp2_iso_prop$OxD ~ gfp2_iso_prop$RDoublePrime, type = 'l', col = colors4[4], lwd = 2)
-points(gfp1_max_prop$OxD ~ gfp1_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2)
-points(gfp1_iso_prop$OxD ~ gfp1_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2)
+```{r OxD and E, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+plot(gfp1r12_max_prop$OxD ~ gfp1r12_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Fraction of sensors oxidized", main = "Normalized R -> fraction oxidized")
+points(gfp1r12_iso_prop$OxD ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2)
 
-legend("bottomright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+legend("bottomright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
            
-plot(gfp2_max_prop$E ~ gfp2_max_prop$RDoublePrime, type = 'l', ylim = c(-325, -200), col = colors4[3], lwd = 2, bty = 'l', xlab = "R''", ylab = expression('E'['GSH']), main = "Normalized R -> half-cell potential")
-points(gfp2_iso_prop$E ~ gfp2_iso_prop$RDoublePrime, type = 'l', lwd = 2, col = colors4[4])
-points(gfp1_max_prop$E ~ gfp1_max_prop$RDoublePrime, type = 'l', lwd = 2, col = colors4[2])
-points(gfp1_iso_prop$E ~ gfp1_iso_prop$RDoublePrime, type = 'l', lwd = 2, col = colors4[1])
+plot(gfp1r12_max_prop$E ~ gfp1r12_max_prop$RDoublePrime, type = 'l', ylim = c(-325, -200), col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = expression('E'['GSH']), main = "Normalized R -> half-cell potential")
+points(gfp1r12_iso_prop$E ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', lwd = 2, col = colors4[1])
 
-legend("bottomright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+legend("bottomright", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 ```
 
-```{r Sensitivity of E and OxD,  fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
-plot(gfp1_max_prop$OxD_sen ~ gfp1_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Relative sensitivity of OxD", ylim = c(0, 3), main = "Normalized R -> sensitivity of fraction oxidized")
-points(gfp1_iso_prop$OxD_sen ~ gfp1_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2)
-points(gfp2_max_prop$OxD_sen ~ gfp2_max_prop$RDoublePrime, type = 'l', col = colors4[3], lwd = 2)
-points(gfp2_iso_prop$OxD_sen ~ gfp2_iso_prop$RDoublePrime, type = 'l', col = colors4[4],lwd = 2)
+```{r Sensitivity of E and OxD,  fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+plot(gfp1r12_max_prop$OxD_sen ~ gfp1r12_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Relative sensitivity of OxD", ylim = c(0, 3), main = "Normalized R -> sensitivity of fraction oxidized")
+points(gfp1r12_iso_prop$OxD_sen ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2)
 
-legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+legend("topright", xpd=TRUE, c("GFP1-R12 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
 
-plot(gfp1_max_prop$E_sen ~ gfp1_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Relative sensitivity of E", ylim = c(0, 200), main = "Normalized R -> sensitivity of half-cell potential")
-points(gfp1_iso_prop$E_sen ~ gfp1_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2, lty = 1)
-points(gfp2_max_prop$E_sen ~ gfp2_max_prop$RDoublePrime, type = 'l', col = colors4[3], lwd = 2, lty = 3)
-points(gfp2_iso_prop$E_sen ~ gfp2_iso_prop$RDoublePrime, type = 'l', col = colors4[4],lwd = 2)
+plot(gfp1r12_max_prop$E_sen ~ gfp1r12_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Relative sensitivity of E", ylim = c(0, 200), main = "Normalized R -> sensitivity of half-cell potential")
+points(gfp1r12_iso_prop$E_sen ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', col = colors4[1], lwd = 2, lty = 1)
 
-legend("top", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+legend("top", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 ```
 
 ## Error in half-cell potential readout given a 5% error in R
-```{r, fig.align='center', fig.height = 5, fig.width = 10}
-par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+```{r, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 
-plot(gfp1_max_prop$E ~ gfp1_max_prop$Error5, type = 'l', xlim = c(0, 20), ylim = c(-350, -150), col = colors4[2], lwd = 2, bty = 'l', xlab = "Minimum Error", ylab = expression(E[GSH]), main = "5% error in R -> Measures of E detectable within error")
-points(gfp1_iso_prop$E ~ gfp1_iso_prop$Error5, type = 'l', col = colors4[1], lwd = 2)
-points(gfp2_max_prop$E ~ gfp2_max_prop$Error5, type = 'l', col = colors4[3], lwd = 2)
-points(gfp2_iso_prop$E ~ gfp2_iso_prop$Error5, type = 'l', col = colors4[4], lwd = 2)
+plot(gfp1r12_max_prop$E ~ gfp1r12_max_prop$Error5, type = 'l', xlim = c(0, 20), ylim = c(-350, -150), col = colors4[2], lwd = 2, bty = 'l', xlab = "Minimum Error", ylab = expression(E[GSH]), main = "5% error in R -> Measures of E detectable within error")
+points(gfp1r12_iso_prop$E ~ gfp1r12_iso_prop$Error5, type = 'l', col = colors4[1], lwd = 2)
 
-legend("top", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
 
-plot(min(gfp1_max_prop$Error5) ~ I(gfp1_max_prop$Rmax/gfp1_max_prop$Rmin), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(0, 40), ylab = "Minimum Error (mV)", xlab = expression(R[Max]/R[Min]), main = "Fold-change inversely related to minimum error")
-points(min(gfp1_iso_prop$Error5) ~ I(gfp1_iso_prop$Rmax/gfp1_iso_prop$Rmin), col = colors4[1],pch = 16, cex = 2)
-points(min(gfp2_max_prop$Error5) ~ I(gfp2_max_prop$Rmax/gfp2_max_prop$Rmin), col = colors4[3],pch = 16, cex = 2)
-points(min(gfp2_iso_prop$Error5) ~ I(gfp2_iso_prop$Rmax/gfp2_iso_prop$Rmin), col = colors4[4],pch = 16, cex = 2)
+legend("top", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 
-legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+plot(min(gfp1r12_max_prop$Error5) ~ I(gfp1r12_max_prop$Rmax/gfp1r12_max_prop$Rmin), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(0, 40), ylab = "Minimum Error (mV)", xlab = expression(R[Max]/R[Min]), main = "Fold-change inversely related to minimum error")
+points(min(gfp1r12_iso_prop$Error5) ~ I(gfp1r12_iso_prop$Rmax/gfp1r12_iso_prop$Rmin), col = colors4[1],pch = 16, cex = 2)
 
-plot(min(gfp1_max_prop$Error5) ~ log(gfp1_max_prop$delta), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(-2, 2), ylab = "Minimum Error (mV)", xlab = expression(ln(delta)), main = "Relationship between delta and minimum error?")
-points(min(gfp1_iso_prop$Error5) ~ log(gfp1_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
-points(min(gfp2_max_prop$Error5) ~ log(gfp2_max_prop$delta), col = colors4[3],pch = 16, cex = 2)
-points(min(gfp2_iso_prop$Error5) ~ log(gfp2_iso_prop$delta), col = colors4[4],pch = 16, cex = 2)
+legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 
-legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso", "GFP2 Max","GFP2 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1], colors4[3], colors4[4]), cex = 1)
+plot(min(gfp1r12_max_prop$Error5) ~ log(gfp1r12_max_prop$delta), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(-2, 2), ylab = "Minimum Error (mV)", xlab = expression(ln(delta)), main = "Relationship between delta and minimum error?")
+points(min(gfp1r12_iso_prop$Error5) ~ log(gfp1r12_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
+
+
+legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 ```
