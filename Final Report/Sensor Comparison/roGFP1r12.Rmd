@@ -267,6 +267,24 @@ legend("topright", xpd=TRUE, c("Oxidized", "Reduced"), pch = "-", lwd = 4, col =
 #dev.off()
 ```
 
+```{r plot-full-spectra}
+par(pty = 's', mfrow = c(1,1), mai = c(1, 0.8, 0.4, 0.8))
+
+gfp1r12_full <- read.csv("rogfp1r12_full.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+
+plot(gfp1r12_full$V2 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[1], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
+
+points(gfp1r12_full$V6 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[9])
+
+points(gfp1r12_full$V3 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[6], lty = 'dotted')
+points(gfp1r12_full$V4 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[7], lty = 'dotted')
+points(gfp1r12_full$V5 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[8], lty = 'dotted')
+
+legend("topright", title = "Percent Oxidized", xpd=TRUE, c("100", "31", "16", "5", "0"), pch = "-", lwd = 4, col = c(coolwarm(9)[c(1, 6, 7, 8, 9)]), cex = 1)
+
+```
+
 ## Delta profiles
 ```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
@@ -396,4 +414,11 @@ points(min(gfp1r12_iso_prop$Error5) ~ log(gfp1r12_iso_prop$delta), col = colors4
 
 
 legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
+```
+
+```{r extra}
+png("rogfp1r12_R_OxD.jpg")
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+plot(gfp1r12_prop$OxD ~ gfp1r12_prop$R, type = 'l', xlab = "R", ylab = "OxD (Fraction Oxidized)", bty = 'l', col = colors4[1], lwd = 2)
+dev.off()
 ```

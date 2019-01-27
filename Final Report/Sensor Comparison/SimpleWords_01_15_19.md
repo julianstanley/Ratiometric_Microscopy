@@ -75,4 +75,33 @@ So, in this case, $\delta_{470}$ is $0.26$. What if it were different? Figure 2 
 
 In a real-world experiment, our measure of the emission ratio $R$ is not going to be perfect. When we perform experiments in *C. elegans* with roGFP-R12, we see a variation in $R$ of about $5\%$. 
 
-...(To be continued)
+How might such variation change how confident we are in our value of the fraction oxidized?
+
+To get a better idea of the general case, let's look at a specific example. 
+
+------------
+
+<img src="C:\Users\Julian\Desktop\2018 Ubuntu Shared\GitShared\Ratiometric_Microscopy\Final Report\Sensor Comparison\rogfp1r12_R_OxD.jpg" width="500px" />
+
+**Figure 3.** The horizontal axis represents the ratio intensity of a sensor. The vertical axis represents the fraction of sensor molecules that are oxidized. This graph shows the typical relationship of how many roGFP1-R12 sensor molecules are oxidized at each ratio-intensity value. 
+
+---------
+
+Let's imagine that, in a given cell, the *true* value of $R$ is $6.0$. If we have a variation in $R$ of around $5\%$, that means that the $R$ we record from the microscope should be $6.0 \pm 5\%$,  or anywhere from $5.7$ to $6.3$. 
+
+Our *true* value of fraction oxidized ($OxD$), which corresponds to an $R$ of $6.0$,  is $0.94$ ($94\%$). If we actually got a value of $5.7$, then our $OxD$ would be $0.92$ ($92\%$). If we actually got a value of $6.3$, it would be $0.96$ ($96 \%$). So, at most, our value of $OxD$ will be off by $0.2$ ($2\%$).
+
+But, since our graph in Figure 3 is nonlinear, our error value of $2\%$ will only be true for when our *true* value of $R$ is near $6.0$. For example, what if our true value of $R$ was $1.5$? An $R$ of $1.5$  corresponds to an $OxD$ of $0.05$ ($5\%$). With a $5\%$ variation, our $R$ could be  $1.425$ or $1.575$, corresponding to an $OxD$ of $0.01$ ($1\%$) and $0.10$ ($10\%$), respectively. So, in this case, our value of $OxD$ could be off by as much as $0.05$ ($5\%$).
+
+In general, the further away from $1$ that our value of $\delta_{470}$ gets, the larger the difference in errors gets between values of $R$.  
+
+
+
+#### Main points
+
+* The confidence that we have in a measurement of the fraction of sensor molecules that are oxidized depends on the 
+
+----------------------
+
+
+
