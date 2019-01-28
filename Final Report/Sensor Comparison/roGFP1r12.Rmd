@@ -316,7 +316,7 @@ For GFP1-R12:
 
 
 
-```{r Initalize two sets of roGFP1 and roGFP2}
+```{r Initalize two sets of roGFP1-R12}
 
 # Get other properties
 gfp1r12_iso_prop <- initSensor(gfp1r12_dat, c(400, 420), c(415, 435), gfp1r12_e0)
@@ -381,6 +381,137 @@ points(gfp1r12_iso_prop$E ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', lwd = 2, 
 legend("bottomright", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 ```
 
+## Error in R
+
+```{r precision in R, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+
+plot(gfp1r12_prop$R * 1.03 ~ gfp1r12_prop$R, type = 'l', xlab = "R", ylab = "Observed R")
+points(gfp1r12_prop$R * 0.97 ~ gfp1r12_prop$R, type = 'l')
+
+polygon(c(gfp1r12_prop$R, rev(gfp1r12_prop$R)), y = c(gfp1r12_prop$R * 1.03, rev(gfp1r12_prop$R * 0.97)), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("topleft", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+```{r R to OxD precision, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_top <- OXD(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta)
+values_bottom <- OXD(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta)
+
+plot(values_top ~ gfp1r12_prop$R, type = 'l', xlab = "R", ylab = "Observed OxD")
+points(values_bottom ~ gfp1r12_prop$R, type = 'l')
+
+polygon(c(gfp1r12_prop$R, rev(gfp1r12_prop$R)), y = c(values_top, rev(values_bottom)), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+```{r R to E precision, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_bottom <- E(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_top <- E(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+
+plot(values_top ~ gfp1r12_prop$R, type = 'l', xlab = "R", ylab = "Observed E", ylim = c(-300, -200))
+points(values_bottom ~ gfp1r12_prop$R, type = 'l')
+
+limits <- c(100, 5497)
+polygon(c(gfp1r12_prop$R[limits[1]:limits[2]], rev(gfp1r12_prop$R[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+```{r E to E precision, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_bottom <- E(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_top <- E(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_actual <- E(gfp1r12_prop$R,  Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+
+plot(values_top ~ values_actual, type = 'l', xlab = "Actual E", ylab = "Observed E", ylim = c(-300, -200), xlim = c(-300,-200))
+points(values_bottom ~ values_actual, type = 'l')
+
+limits <- c(100, 5497)
+polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+```{r E to E precision example, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_bottom <- E(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_top <- E(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_actual <- E(gfp1r12_prop$R,  Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+
+plot(values_top ~ values_actual, type = 'l', xlab = "Actual E", ylab = "Observed E", ylim = c(-300, -200), xlim = c(-300,-200))
+points(values_bottom ~ values_actual, type = 'l')
+
+limits <- c(100, 5497)
+polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+
+```{r Phase Plot 1, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+
+error_2 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 2)
+error_3 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 3)
+error_4 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 4)
+colors <- coolwarm(9)
+
+plot(gfp1r12_prop$E ~ error_2, type = 'l', xlim = c(0, 5), ylim = c(-300, -220), col = colors[7], lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = "")
+axis(side = 1, at = seq(0, 5, by = 0.1), 
+     labels = FALSE, tcl = -0.2) 
+axis(side = 2, at = seq(-300, -200, by = 5), 
+     labels = FALSE, tcl = -0.2) 
+points(gfp1r12_prop$E ~ error_3, type = 'l', col = colors[8], lwd = 2)
+points(gfp1r12_prop$E ~ error_4, type = 'l', col = colors[9], lwd = 2)
+#points(x = c(2,2), y = (c(-220, -300)), type = "l")
+#points(x = c(min(error_2), min(error_2)), y = (c(-200, -300)), type = "l")
+
+
+legend("right", title = "Empircal precision in R", xpd=TRUE, c("2%", "3%", "4%"), pch = "-", lwd = 4, col = c(colors[7:9]), cex = 1)
+```
+
+```{r Phase Plot 2, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+
+
+error_4 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 4)
+colors <- coolwarm(9)
+
+bounds <- c(-290, -220)
+plot(gfp1r12_prop$E ~ error_4, type = 'l', xlim = c(0, 5), ylim = bounds, col = colors[9], lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = "")
+axis(side = 1, at = seq(0, 5, by = 0.1), 
+     labels = FALSE, tcl = -0.2) 
+axis(side = 2, at = seq(-300, -200, by = 1), 
+     labels = FALSE, tcl = -0.2) 
+
+points(x = c(2,2), y = (bounds), type = "l")
+
+good_area <- data.frame(acc = subset(error_4, error_4 < 2.01),
+                        E = subset(gfp1r12_prop$E, error_4 < 2.01))
+
+polygon(c(2, good_area$acc, 2), y = c(max(good_area$E), good_area$E, min(good_area$E)), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+
+```
+
+```{r not sure}
+plot(min(gfp1r12_max_prop$Error5) ~ I(gfp1r12_max_prop$Rmax/gfp1r12_max_prop$Rmin), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(0, 40), ylab = "Minimum Error (mV)", xlab = expression(R[Max]/R[Min]), main = "Fold-change inversely related to minimum error")
+points(min(gfp1r12_iso_prop$Error5) ~ I(gfp1r12_iso_prop$Rmax/gfp1r12_iso_prop$Rmin), col = colors4[1],pch = 16, cex = 2)
+
+legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
+
+plot(min(gfp1r12_max_prop$Error5) ~ log(gfp1r12_max_prop$delta), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(-2, 2), ylab = "Minimum Error (mV)", xlab = expression(ln(delta)), main = "Relationship between delta and minimum error?")
+points(min(gfp1r12_iso_prop$Error5) ~ log(gfp1r12_iso_prop$delta), col = colors4[1],pch = 16, cex = 2)
+
+
+legend("topright", xpd=TRUE, c("GFP1 Max", "GFP1 Iso"), pch = "-", lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
+```
+
+
 ```{r Sensitivity of E and OxD,  fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 plot(gfp1r12_max_prop$OxD_sen ~ gfp1r12_max_prop$RDoublePrime, type = 'l', col = colors4[2], lwd = 2, bty = 'l', xlab = "R''", ylab = "Relative sensitivity of OxD", ylim = c(0, 3), main = "Normalized R -> sensitivity of fraction oxidized")
@@ -393,6 +524,7 @@ points(gfp1r12_iso_prop$E_sen ~ gfp1r12_iso_prop$RDoublePrime, type = 'l', col =
 
 legend("top", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), lwd = 4, col = c(colors4[2], colors4[1]), cex = 1)
 ```
+
 
 ## Error in half-cell potential readout given a 5% error in R
 ```{r, fig.align='center', fig.height = 5, fig.width = 5}
