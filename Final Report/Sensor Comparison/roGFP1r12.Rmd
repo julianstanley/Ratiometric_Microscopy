@@ -253,15 +253,15 @@ gfp1r12_prop <- initSensor(gfp1r12_dat, c(400, 420), c(460, 480), gfp1r12_e0)
 
 ## Excitation-emission profiles
 
-```{r Plot spectra, fig.align='center', fig.height = 5, fig.width = 5}
+```{r Plot spectra, fig.align='center', fig.height=5, fig.width=5}
 #png("rogfp1r12_spectra.jpg")
 
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 
-plot(gfp1r12_prop$data$ox ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
-points(gfp1r12_prop$data$red ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[2])
+plot(gfp1r12_prop$data$ox ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[2], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
+points(gfp1r12_prop$data$red ~ gfp1r12_prop$data$lambda, type = 'l', col = coolwarm(2)[1])
 
-legend("topright", xpd=TRUE, c("Oxidized", "Reduced"), pch = "-", lwd = 4, col = c(coolwarm(2)), cex = 1)
+legend("topright", xpd=TRUE, c("Oxidized", "Reduced"), pch = "-", lwd = 4, col = c(rev(coolwarm(2))), cex = 1)
 
 
 #dev.off()
@@ -272,19 +272,49 @@ par(pty = 's', mfrow = c(1,1), mai = c(1, 0.8, 0.4, 0.8))
 
 gfp1r12_full <- read.csv("rogfp1r12_full.csv", header = FALSE, stringsAsFactors = FALSE, 
                     fileEncoding="UTF-8-BOM")
+colors <- coolwarm(5)
 
-plot(gfp1r12_full$V2 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[1], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
+plot(gfp1r12_full$V2 ~ gfp1r12_full$V1, type = 'l', col = colors[5], main = "Emission spectrum of GFP1-R12", xlab = expression(lambda ~ (nm)), ylab = "Emission (relative)", bty = 'L')
 
-points(gfp1r12_full$V6 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[9])
+points(gfp1r12_full$V6 ~ gfp1r12_full$V1, type = 'l', col = colors[1])
 
-points(gfp1r12_full$V3 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[6], lty = 'dotted')
-points(gfp1r12_full$V4 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[7], lty = 'dotted')
-points(gfp1r12_full$V5 ~ gfp1r12_full$V1, type = 'l', col = coolwarm(9)[8], lty = 'dotted')
+points((gfp1r12_full$V2 * 0.75) + (gfp1r12_full$V6 * 0.25) ~ gfp1r12_full$V1, type = 'l', col = colors[4], lty = 'dashed')
+points((gfp1r12_full$V2 * 0.50) + (gfp1r12_full$V6 * 0.50) ~ gfp1r12_full$V1, type = 'l', col = colors[3], lty = 'dashed')
+points((gfp1r12_full$V2 * 0.25) + (gfp1r12_full$V6 * 0.75) ~ gfp1r12_full$V1, type = 'l', col = colors[2], lty = 'dashed')
 
-legend("topright", title = "Percent Oxidized", xpd=TRUE, c("100", "31", "16", "5", "0"), pch = "-", lwd = 4, col = c(coolwarm(9)[c(1, 6, 7, 8, 9)]), cex = 1)
+legend("topright", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
 
 ```
 
+```{r plot-concentration, fig.align='center', fig.height=5, fig.width=5}
+colors <- coolwarm(5)
+
+par(pty = 's', mfrow = c(1,1))
+emission_ox <- seq(401, 500, by = 1)
+emission_red <- seq(1, 100, by = 1)
+emission_25ox <- seq(101, 200, by = 1)
+emission_50ox <- seq(201, 300, by = 1)
+emission_75ox <- seq(301, 400, by = 1)
+
+concentration <- seq(1, 100, by = 1)
+
+plot(emission_ox ~ concentration, main = "Emission is a function of concentration", xlab = "roGFP concentration (relative)", ylab = "Emission readout (relative)", type = 'l', xlim = c(1, 100), ylim = c(1, 1000), col = colors[5], lwd = 3)
+points(emission_25ox ~ concentration, type = 'l', col = colors[2], lwd = 3)
+points(emission_50ox ~ concentration, type = 'l', col = colors[3], lwd = 3)
+points(emission_75ox ~ concentration, type = 'l', col = colors[4], lwd = 3)
+points(emission_red ~ concentration, type = 'l', col = colors[1], lwd = 3)
+
+legend("top", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
+
+plot(rep(5, 100) ~ concentration, main = "Ratiometric outputs are independent \n of concentration", xlab = "roGFP concentration (relative)", ylab = "R (relative)", type = 'l', xlim = c(1, 100), ylim = c(1,10), col = colors[5], lwd = 3)
+points(rep(2, 100) ~ concentration, type = 'l', col = colors[2], lwd = 3)
+points(rep(3, 100 ) ~ concentration, type = 'l', col = colors[3], lwd = 3)
+points(rep(4, 100)~ concentration, type = 'l', col = colors[4], lwd = 3)
+points(rep(1, 100) ~ concentration, type = 'l', col = colors[1], lwd = 3)
+
+legend("top", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
+
+```
 ## Delta profiles
 ```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
@@ -314,7 +344,32 @@ For GFP1-R12:
 * Use $\frac{410 +/- 5 nm}{470 +/- 5 nm}$ for maximum total dynamic range
 
 
+```{r plot R12 at different deltas, fig.align='center', fig.height=5, fig.width=5}
+colors <- coolwarm(6)
 
+gfpr12_deltas_df <- data.frame(lambda = gfp1r12_prop$data$lambda, deltas = gfp1r12_deltas)
+
+OXD_390 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 389 & gfpr12_deltas_df$lambda < 391)[1])
+
+OXD_410 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 409 & gfpr12_deltas_df$lambda < 411)[1])
+
+OXD_430 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 429 & gfpr12_deltas_df$lambda < 431)[1])
+
+OXD_450 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 449 & gfpr12_deltas_df$lambda < 451)[1])
+
+OXD_470 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 469 & gfpr12_deltas_df$lambda < 471)[1])
+
+OXD_490 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 489 & gfpr12_deltas_df$lambda < 491)[1])
+
+plot(OXD_490 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[1])
+points(OXD_470 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[2])
+points(OXD_450 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[3])
+points(OXD_430 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[4])
+points(OXD_410 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[5])
+points(OXD_390 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[6])
+
+legend("bottomright", title = expression(lambda[2]), xpd=TRUE, c("490", "470", "450", "430", "410", "390"), pch = "-", lwd = 4, col = colors, cex = 1)
+```
 
 ```{r Initalize two sets of roGFP1-R12}
 
