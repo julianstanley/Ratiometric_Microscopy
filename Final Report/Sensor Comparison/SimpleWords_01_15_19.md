@@ -10,7 +10,7 @@ Our sensors have an extra feature in that they have two "states", like the "on" 
 
 <img src="C:\Users\Julian\Desktop\2018 Ubuntu Shared\GitShared\Ratiometric_Microscopy\Final Report\Sensor Comparison\rogfp1r12_spectra.jpg" width="500px" />
 
-**Figure 1**. The horizontal (x) axis shows the wavelength $\lambda$ of light being shined on the sensor. The vertical (y) axis shows the amount of light that the sensor shines back at the microscope. Notice that, at the wavelengths around 350-400nm, the sensor gives off  **more** light if it's oxidized but, around 450-600nm, the sensor gives of **less** light if it's oxidized.  That'll come in handy in a moment.
+**Figure 1**. The horizontal (x) axis shows the wavelength $\lambda​$ of light being shined on the sensor. The vertical (y) axis shows the amount of light that the sensor shines back at the microscope. Notice that, at the wavelengths around 350-400nm, the sensor gives off  **more** light if it's oxidized but, around 450-600nm, the sensor gives of **less** light if it's oxidized.  That'll come in handy in a moment.
 
 -------
 
@@ -95,13 +95,33 @@ But, since our graph in Figure 3 is nonlinear, our error value of $2\%$ will onl
 
 In general, the further away from $1$ that our value of $\delta_{470}$ gets, the larger the difference in errors gets between values of $R$.  
 
-
-
 #### Main points
 
-* The confidence that we have in a measurement of the fraction of sensor molecules that are oxidized depends on the 
+- The confidence that we have in a measurement of the fraction of sensor molecules that are oxidized depends on how close to the $0\%$ or $100\%$ that measurement is.
 
-----------------------
+# Finding the redox potential
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

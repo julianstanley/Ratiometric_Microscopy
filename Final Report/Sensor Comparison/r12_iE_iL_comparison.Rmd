@@ -1,0 +1,350 @@
+---
+output:
+ html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r colors}
+# Define coolwarm color gradient
+coolwarm <- colorRampPalette(c(
+  rgb( 60, 81,198, maxColorValue = 255),
+  rgb( 61, 86,203, maxColorValue = 255),
+  rgb( 63, 91,207, maxColorValue = 255),
+  rgb( 65, 96,212, maxColorValue = 255),
+  rgb( 67,101,216, maxColorValue = 255),
+  rgb( 69,106,220, maxColorValue = 255),
+  rgb( 71,111,224, maxColorValue = 255),
+  rgb( 74,116,227, maxColorValue = 255),
+  rgb( 76,121,231, maxColorValue = 255),
+  rgb( 79,127,233, maxColorValue = 255),
+  rgb( 83,132,236, maxColorValue = 255),
+  rgb( 86,137,238, maxColorValue = 255),
+  rgb( 90,143,240, maxColorValue = 255),
+  rgb( 94,148,242, maxColorValue = 255),
+  rgb( 99,153,243, maxColorValue = 255),
+  rgb(103,159,244, maxColorValue = 255),
+  rgb(109,164,244, maxColorValue = 255),
+  rgb(114,169,245, maxColorValue = 255),
+  rgb(120,174,245, maxColorValue = 255),
+  rgb(126,179,245, maxColorValue = 255),
+  rgb(132,184,244, maxColorValue = 255),
+  rgb(139,188,243, maxColorValue = 255),
+  rgb(146,193,242, maxColorValue = 255),
+  rgb(153,197,241, maxColorValue = 255),
+  rgb(161,201,239, maxColorValue = 255),
+  rgb(169,205,238, maxColorValue = 255),
+  rgb(177,209,236, maxColorValue = 255),
+  rgb(186,212,233, maxColorValue = 255),
+  rgb(195,215,231, maxColorValue = 255),
+  rgb(204,218,229, maxColorValue = 255),
+  rgb(214,221,226, maxColorValue = 255),
+  rgb(223,223,223, maxColorValue = 255),
+  rgb(235,218,215, maxColorValue = 255),
+  rgb(245,213,207, maxColorValue = 255),
+  rgb(255,206,198, maxColorValue = 255),
+  rgb(255,192,184, maxColorValue = 255),
+  rgb(255,180,170, maxColorValue = 255),
+  rgb(255,168,159, maxColorValue = 255),
+  rgb(255,157,148, maxColorValue = 255),
+  rgb(255,147,139, maxColorValue = 255),
+  rgb(255,138,130, maxColorValue = 255),
+  rgb(255,129,122, maxColorValue = 255),
+  rgb(255,121,115, maxColorValue = 255),
+  rgb(255,113,109, maxColorValue = 255),
+  rgb(255,105,103, maxColorValue = 255),
+  rgb(255, 98, 98, maxColorValue = 255),
+  rgb(255, 91, 93, maxColorValue = 255),
+  rgb(255, 85, 89, maxColorValue = 255),
+  rgb(255, 78, 85, maxColorValue = 255),
+  rgb(255, 72, 81, maxColorValue = 255),
+  rgb(255, 67, 78, maxColorValue = 255),
+  rgb(255, 61, 75, maxColorValue = 255),
+  rgb(255, 56, 72, maxColorValue = 255),
+  rgb(255, 50, 70, maxColorValue = 255),
+  rgb(255, 45, 67, maxColorValue = 255),
+  rgb(255, 41, 65, maxColorValue = 255),
+  rgb(252, 35, 62, maxColorValue = 255),
+  rgb(242, 30, 58, maxColorValue = 255),
+  rgb(233, 24, 55, maxColorValue = 255),
+  rgb(223, 20, 51, maxColorValue = 255),
+  rgb(212, 15, 48, maxColorValue = 255),
+  rgb(202, 11, 44, maxColorValue = 255),
+  rgb(191,  7, 41, maxColorValue = 255),
+  rgb(180,  4, 38, maxColorValue = 255)))
+
+colors4 <- c(
+    rgb(151, 99, 172, maxColorValue = 255),
+    rgb(214, 154, 191, maxColorValue = 255),
+    rgb(249, 188, 112, maxColorValue = 255),
+    rgb(224, 120, 34, maxColorValue = 255))
+
+# Define plotting parameters
+cex.lab <- 1.5
+cex.axis <- 1.5
+```
+
+```{r equations}
+# Define the fraction oxidized
+OXD <- function(R, Rmin, Rmax, delta) {
+      return (
+        (R - Rmin)/((R - Rmin) + (delta*(Rmax - R)))
+      )
+}
+
+# Define the redox potential
+E <- function(e0, R, Rmin, Rmax, delta) {
+  return(e0 - 12.71 * log((delta*Rmax - delta*R)/(R-Rmin)))
+}
+
+Eeff <- function(delta_470, e0) {
+    return (
+        e0 - 12.71 * log(delta_470)
+    )
+}
+
+# Define the derivative of OxD
+D_OXD <- function(R, Rmin, Rmax, delta) {
+    return (
+        (delta * (Rmax - Rmin)) /
+            ((R * (delta - 1) - (delta * Rmax) + Rmin)^2)
+    )
+}
+
+# Define the derivative of E
+D_E <- function(R, Rmin, Rmax) {
+    return(
+        (-12.71*(Rmax-Rmin))/((R-Rmin)*(R-Rmax))
+    )
+}
+
+# Define a percent error
+Error_E <- function(R, Rmin, Rmax, delta, e0, percent_error) {
+    answer <- c()
+        for (Rind in R) {
+            if((Rind * (1 - percent_error/100) >= Rmin) && (Rind * (1 + percent_error/100) <= Rmax)) {
+                err <- max(
+                abs(E(R = Rind, e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta) 
+                    - E(R = Rind * (1 + percent_error/100), e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta)),
+                abs(E(R = Rind, e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta) 
+                    - E(R = Rind * (1 - percent_error/100), e0 = e0, Rmin = Rmin, Rmax = Rmax, delta = delta))
+                )
+                answer <- c(answer, err)
+            }
+            
+            else {
+            
+            answer <- c(answer, Inf)
+            
+            }
+        }
+        
+    return(answer)
+    
+}
+```
+
+```{r combine-helper}
+# Turn two pairs of lambda-emission spectra into a 3-column dataframe
+combine <- function(ox_lambda, ox_value, red_lambda, red_value) {
+    start <- max(ox_lambda[1], red_lambda[1])
+    end <- min(ox_lambda[length(ox_lambda)], red_lambda[length(red_lambda)])
+    
+    range <- seq(start, end, by = 0.1)
+    ox_value_new <- c()
+    red_value_new <- c()
+    
+    for (lambda in range) {
+        # Find the ox value closest to the lambda
+        closest_value = Inf
+        closest_index = NaN
+        for (old_lambda_index in 1:length(ox_lambda)) {
+            old_lambda_diff = abs(ox_lambda[old_lambda_index] - lambda)
+            if (old_lambda_diff < closest_value) {
+                closest_value = old_lambda_diff
+                closest_index = old_lambda_index
+            }
+        }
+        
+        ox_value_new <- c(ox_value_new, ox_value[closest_index])
+        
+         # Find the red value closest to the lambda
+        closest_value = Inf
+        closest_index = NaN
+        for (old_lambda_index in 1:length(red_lambda)) {
+            old_lambda_diff = abs(red_lambda[old_lambda_index] - lambda)
+            if (old_lambda_diff < closest_value) {
+                closest_value = old_lambda_diff
+                closest_index = old_lambda_index
+            }
+        }
+        
+        red_value_new <- c(red_value_new, red_value[closest_index])
+        
+    
+    }
+    
+    return(data.frame(lambda = range, ox = ox_value_new, red = red_value_new))
+    
+}
+```
+
+```{r Initalize sensor function}
+# Write a function that, given a sensor and two sets of lambda bands, returns a list of properties
+# Sensor data format: 
+initSensor <- function(sensor_data, lambda_1, lambda_2, e0) {
+    # Clean data
+    ox_lambda <- na.omit(sensor_data[[1]])
+    ox_value <- na.omit(sensor_data[[2]])
+    red_lambda <- na.omit(sensor_data[[3]])
+    red_value <- na.omit(sensor_data[[4]])
+    
+    # Set delta
+    delta <- mean(ox_value[ox_lambda >= lambda_2[1] & ox_lambda <= lambda_2[2]]) /  
+                    mean(red_value[red_lambda >= lambda_2[1] & red_lambda <= lambda_2[2]])
+    
+    # Set Rmin and Rmax
+    Rmin <- mean(red_value[red_lambda >= lambda_1[1] & red_lambda <= lambda_1[2]]) /  
+                    mean(red_value[red_lambda >= lambda_2[1] & red_lambda <= lambda_2[2]])
+    
+    Rmax <- mean(ox_value[ox_lambda >= lambda_1[1] & ox_lambda <= lambda_1[2]]) /  
+                    mean(ox_value[ox_lambda >= lambda_2[1] & ox_lambda <= lambda_2[2]])
+
+    
+    # Generate some R, OxD, and E values
+    R <- seq(Rmin, Rmax, by = 0.001)
+    OxD_values <- OXD(R, Rmin, Rmax, delta)
+    E_values <- E(e0, R, Rmin, Rmax, delta)
+    
+    # Generate R' and R''
+    RPrime <- R/Rmin
+    RDoublePrime <- (R-Rmin)/(Rmax-Rmin)
+    
+    # Generate partial derivatives
+    OxD_sen <- D_OXD(R = R, Rmin = Rmin, Rmax = Rmax, delta = delta)
+    E_sen <- D_E(R = R, Rmin = Rmin, Rmax = Rmax)
+    
+    # Generate 5% errors
+    Error5 <- Error_E(R = R, Rmin = Rmin, Rmax = Rmax, delta = delta, e0 = e0, percent_error = 5) 
+    
+    # Return the final list
+    return(list(data = combine(ox_lambda, ox_value, red_lambda, red_value), e0 = e0, Eeff = Eeff(delta_470 = delta, e0 = e0),
+                OxD_sen = OxD_sen, E_sen = E_sen, Error5 = Error5,
+                delta = delta, Rmin = Rmin, Rmax = Rmax, R = R, OxD = OxD_values, E = E_values, 
+                RPrime = RPrime, RDoublePrime = RDoublePrime))
+}
+```
+
+```{r Initalize sensors}
+# Import GFP1/2 data
+gfp1r12_dat <- read.csv("rogfp1r12.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+iE_dat <- read.csv("iE/Spectra_IE_CSV.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+iL_dat <- read.csv("iL/Spectra_iL_CSV.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+gfp1_dat <- read.csv("rogfp1.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+gfp2_dat <- read.csv("rogfp2.csv", header = FALSE, stringsAsFactors=FALSE,
+                     fileEncoding="UTF-8-BOM")
+
+# Set known midpoint potentials
+
+# Set known midpoint potentials
+gfp1r12_e0 <-  -265
+iE_e0 <- -236
+iL_e0 <- -229
+gfp1_e0 <-  -288
+gfp2_e0 <- -272
+
+
+# Get other properties
+gfp1r12_prop <- initSensor(gfp1r12_dat, c(400, 420), c(460, 480), gfp1r12_e0)
+gfp1iE_prop <- initSensor(iE_dat, c(400, 420), c(460, 480), iE_e0)
+gfp1iL_prop <- initSensor(iL_dat, c(400, 420), c(460, 480), iL_e0)
+gfp1_prop <- initSensor(gfp1_dat, c(400, 420), c(460, 480), gfp1_e0)
+gfp2_prop <- initSensor(gfp2_dat, c(400, 420), c(460, 480), gfp2_e0)
+```
+
+```{r show-sensor-values}
+values <- (data.frame(
+    c("Delta", "Rmin", "Rmax", "Rmax/Rmin", "Midpoint"),
+    
+    c(gfp1r12_prop$delta,
+      gfp1r12_prop$Rmin,
+      gfp1r12_prop$Rmax,
+      gfp1r12_prop$Rmax/gfp1r12_prop$Rmin,
+      gfp1r12_prop$e0),
+    
+    c(gfp1iL_prop$delta,
+      gfp1iL_prop$Rmin,
+      gfp1iL_prop$Rmax,
+      gfp1iL_prop$Rmax/gfp1iL_prop$Rmin,
+      gfp1iL_prop$e0),
+    
+    c(gfp1iE_prop$delta,
+      gfp1iE_prop$Rmin,
+      gfp1iE_prop$Rmax,
+      gfp1iE_prop$Rmax/gfp1iE_prop$Rmin,
+      gfp1iE_prop$e0)
+    
+    )
+    
+    )
+
+colnames(values) <- c("Characteristic", "GFP1-R12", "GFP1-iL", "GFP1-iE")
+knitr::kable(values, caption = "Characteristics", digits = 2)
+```
+
+```{r Phase Plot 2, fig.align='center', fig.height = 15, fig.width = 15}
+par(pty = 's', mfrow = c(1,1), cex = 2)
+
+
+error_4_R12 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 2)
+error_4_iL = Error_E(gfp1iL_prop$R, Rmin = gfp1iL_prop$Rmin, Rmax = gfp1iL_prop$Rmax, e0 = gfp1iL_prop$e0, delta = gfp1iL_prop$delta, percent_error = 2)
+error_4_iE = Error_E(gfp1iE_prop$R, Rmin = gfp1iE_prop$Rmin, Rmax = gfp1iE_prop$Rmax, e0 = gfp1iE_prop$e0, delta = gfp1iE_prop$delta, percent_error = 2)
+error_4_1 = Error_E(gfp1_prop$R, Rmin = gfp1_prop$Rmin, Rmax = gfp1_prop$Rmax, e0 = gfp1_prop$e0, delta = gfp1_prop$delta, percent_error = 2)
+error_4_2 = Error_E(gfp2_prop$R, Rmin = gfp2_prop$Rmin, Rmax = gfp2_prop$Rmax, e0 = gfp1_prop$e0, delta = gfp2_prop$delta, percent_error = 2)
+
+
+colors <- coolwarm(9)
+
+bounds <- c(-320, -200)
+plot(gfp1r12_prop$E ~ error_4_R12, type = 'l', xlim = c(0, 5), ylim = bounds, col = colors4[3], lwd = 4, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = "")
+points(gfp1iL_prop$E ~ error_4_iL, type = 'l', col = colors4[2], lwd = 4)
+points(gfp1iE_prop$E ~ error_4_iE, type = 'l', col = colors4[1], lwd = 4)
+points(gfp1_prop$E ~ error_4_1, type = 'l', col = colors4[4], lwd = 4)
+points(gfp2_prop$E ~ error_4_2, type = 'l', col = colors[1], lwd = 4)
+
+axis(side = 1, at = seq(0, 10, by = 0.1), 
+     labels = FALSE, tcl = -0.2) 
+axis(side = 2, at = seq(-320, -200, by = 1), 
+     labels = FALSE, tcl = -0.2) 
+
+#points(x = c(2,2), y = (bounds), type = "l")
+
+legend("topleft", xpd=TRUE, c("roGFP1-R12", "roGFP2-iL", "roGFP1-iE", "roGFP1", "roGFP2"), pch = "-", lwd = 4, col = c(colors4[3:1], colors4[4], colors[1]), cex = 1)
+```
+
+```{r boxplot}
+par(mfrow = c(1,1), mai = c(0.8, 1.5, 0.4, 0.4))
+
+error <- 2
+R12 <- summary(subset(gfp1r12_prop$E, error_4_R12 < error))
+iL <- summary(subset(gfp1iL_prop$E, error_4_iL < error))
+iE <- summary(subset(gfp1iE_prop$E, error_4_iE < error))
+one <- summary(subset(gfp1_prop$E, error_4_1 < error))
+two <- summary(subset(gfp2_prop$E, error_4_2 < error))
+
+boxplot(c(R12[1], R12[6]), c(iL[1], iL[6]), c(iE[1], iE[6]), c(one[1], one[2]), c(two[1], two[2]), c(-320, -260), col = c(colors4[3:1], colors4[4], colors[1], "gray"), horizontal = TRUE, names = c("roGFP1-R12", "roGFP2-iL", "roGFP1-iE", "roGFP1", "roGFP2", "Biological Range"), xlab = expression(E[GSH]), main = "Ranges suitable at an accuracy of 2 mV", ylim = c(-320, -200), las = 2)
+axis(side = 1, at = seq(-320, -200, by = 1), 
+     labels = FALSE, tcl = -0.2) 
+```
+
+```{r}
+par(mfrow = c(1,1), mai = c(0.8, 1.5, 0.4, 0.4))
+boxplot(c(R12[1], R12[6]), c(-280,-260), col = colors4[2:1], horizontal = TRUE, names = c("roGFP1-R12", "Biological Range"), xlab = expression(E[GSH] (mV)), main = "Ranges suitable at an accuracy of 2 mV", ylim = c(-300, -200), las = 2)
+
+```

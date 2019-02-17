@@ -1,8 +1,7 @@
 ---
 output:
-  pdf_document: default
+ pdf_document: default
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -290,27 +289,34 @@ legend("topright", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "2
 colors <- coolwarm(5)
 
 par(pty = 's', mfrow = c(1,1))
-emission_ox <- seq(401, 500, by = 1)
-emission_red <- seq(1, 100, by = 1)
-emission_25ox <- seq(101, 200, by = 1)
-emission_50ox <- seq(201, 300, by = 1)
-emission_75ox <- seq(301, 400, by = 1)
 
-concentration <- seq(1, 100, by = 1)
+concentration <- seq(0, 1, by = 0.01)
 
-plot(emission_ox ~ concentration, main = "Emission is a function of concentration", xlab = "roGFP concentration (relative)", ylab = "Emission readout (relative)", type = 'l', xlim = c(1, 100), ylim = c(1, 1000), col = colors[5], lwd = 3)
+emission_ox <- concentration * 900
+emission_red <- concentration * 600
+emission_25ox <- concentration * 675
+emission_50ox <- concentration * 750
+emission_75ox <- concentration * 825
+
+emission_ox_ratio <- (concentration * 900)  / (concentration * 150)
+emission_red_ratio <- (concentration * 600) / (concentration * 400)
+emission_25ox_ratio <- ( concentration * 675 ) / (concentration * 337.5)
+emission_50ox_ratio <- (concentration * 750) / (concentration * 325)
+emission_75ox_ratio <- (concentration * 825) / (concentration * 212.5)
+
+plot(emission_ox ~ concentration, main = "Emission is a function of concentration", xlab = "roGFP concentration (relative)", ylab = "Emission readout (relative)", type = 'l', xlim = c(0, 1), ylim = c(1, 1000), col = colors[5], lwd = 3)
 points(emission_25ox ~ concentration, type = 'l', col = colors[2], lwd = 3)
 points(emission_50ox ~ concentration, type = 'l', col = colors[3], lwd = 3)
 points(emission_75ox ~ concentration, type = 'l', col = colors[4], lwd = 3)
 points(emission_red ~ concentration, type = 'l', col = colors[1], lwd = 3)
 
-legend("top", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
+legend("topleft", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
 
-plot(rep(5, 100) ~ concentration, main = "Ratiometric outputs are independent \n of concentration", xlab = "roGFP concentration (relative)", ylab = "R (relative)", type = 'l', xlim = c(1, 100), ylim = c(1,10), col = colors[5], lwd = 3)
-points(rep(2, 100) ~ concentration, type = 'l', col = colors[2], lwd = 3)
-points(rep(3, 100 ) ~ concentration, type = 'l', col = colors[3], lwd = 3)
-points(rep(4, 100)~ concentration, type = 'l', col = colors[4], lwd = 3)
-points(rep(1, 100) ~ concentration, type = 'l', col = colors[1], lwd = 3)
+plot(emission_ox_ratio ~ concentration, main = "Ratiometric outputs are independent \n of concentration", xlab = "roGFP concentration (relative)", ylab = "R (relative)", type = 'l', xlim = c(0, 1), ylim = c(1,12), col = colors[5], lwd = 3)
+points(emission_25ox_ratio ~ concentration, type = 'l', col = colors[2], lwd = 3)
+points(emission_50ox_ratio ~ concentration, type = 'l', col = colors[3], lwd = 3)
+points(emission_75ox_ratio ~ concentration, type = 'l', col = colors[4], lwd = 3)
+points(emission_red_ratio ~ concentration, type = 'l', col = colors[1], lwd = 3)
 
 legend("top", title = "Percent Oxidized", xpd=TRUE, c("100", "75", "50", "25", "0"), pch = "-", lwd = 4, col = c(rev(colors)), cex = 1)
 
@@ -506,6 +512,64 @@ polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits
 legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
 ```
 
+### Here
+
+```{r E to difference in E, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_bottom <- E(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_top <- E(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_actual <- E(gfp1r12_prop$R,  Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+
+plot(abs(values_top - values_actual) ~ - values_actual, type = 'l', xlab = "Actual E", ylab = "Deviation from actual", ylim = c(0, 10), xlim = c(-300,-200))
+points(abs(values_bottom - values_actual) ~ values_actual, type = 'l')
+
+limits <- c(50, 5497)
+limits_actual <- values_actual[limits[1]:limits[2]]
+max_errors <- pmax(abs(values_top[limits[1]:limits[2]] - limits_actual), abs(values_bottom[limits[1]:limits[2]] - limits_actual))
+
+polygon(x = c(limits_actual[1], limits_actual,  limits_actual[length(limits_actual)], limits_actual[1]), y = c(0, max_errors, 0, 0), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("top", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+```{r E to E precision example 1, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+values_bottom <- E(gfp1r12_prop$R * 1.03, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_top <- E(gfp1r12_prop$R * 0.97, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+values_actual <- E(gfp1r12_prop$R,  Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = gfp1r12_prop$delta, e0 = gfp1r12_prop$e0)
+
+plot(values_top ~ values_actual, type = 'l', xlab = "Actual E", ylab = "Observed E", ylim = c(-300, -200), xlim = c(-300,-200))
+points(values_bottom ~ values_actual, type = 'l')
+
+limits <- c(100, 5497)
+polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+
+legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+```
+
+
+```{r E to difference in E_max, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+
+error_2 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 2)
+error_3 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 3)
+error_4 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = gfp1r12_prop$delta, percent_error = 4)
+colors <- coolwarm(9)
+
+plot(error_2 ~ gfp1r12_prop$E, type = 'l', ylim = c(0, 5), xlim = c(-300, -220), col = colors[7], lwd = 2, bty = 'l', ylab = "Expected accuracy (mV)", xlab = expression(E[GSH]), main = "")
+axis(side = 2, at = seq(0, 5, by = 0.1), 
+     labels = FALSE, tcl = -0.2) 
+axis(side = 1, at = seq(-300, -200, by = 5), 
+     labels = FALSE, tcl = -0.2) 
+points(error_3 ~ gfp1r12_prop$E, type = 'l', col = colors[8], lwd = 2)
+points(error_4 ~ gfp1r12_prop$E, type = 'l', col = colors[9], lwd = 2)
+#points(x = c(2,2), y = (c(-220, -300)), type = "l")
+#points(x = c(min(error_2), min(error_2)), y = (c(-200, -300)), type = "l")
+
+
+legend("top", title = "Empircal precision in R", xpd=TRUE, c("2%", "3%", "4%"), pch = "-", lwd = 4, col = c(colors[7:9]), cex = 1)
+```
+
 
 ```{r Phase Plot 1, fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
@@ -528,6 +592,7 @@ points(gfp1r12_prop$E ~ error_4, type = 'l', col = colors[9], lwd = 2)
 
 legend("right", title = "Empircal precision in R", xpd=TRUE, c("2%", "3%", "4%"), pch = "-", lwd = 4, col = c(colors[7:9]), cex = 1)
 ```
+
 
 ```{r Phase Plot 2, fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
@@ -552,6 +617,7 @@ polygon(c(2, good_area$acc, 2), y = c(max(good_area$E), good_area$E, min(good_ar
 
 
 ```
+
 
 ```{r not sure}
 plot(min(gfp1r12_max_prop$Error5) ~ I(gfp1r12_max_prop$Rmax/gfp1r12_max_prop$Rmin), col = colors4[2], bty = 'l',pch = 16, cex = 2, ylim = c(0, 10), xlim = c(0, 40), ylab = "Minimum Error (mV)", xlab = expression(R[Max]/R[Min]), main = "Fold-change inversely related to minimum error")
@@ -582,6 +648,7 @@ legend("top", xpd=TRUE, c("GFP1-R12 Max", "GFP1-R12 Iso"), lwd = 4, col = c(colo
 
 
 ## Error in half-cell potential readout given a 5% error in R
+
 ```{r, fig.align='center', fig.height = 5, fig.width = 5}
 par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 
@@ -609,3 +676,4 @@ par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
 plot(gfp1r12_prop$OxD ~ gfp1r12_prop$R, type = 'l', xlab = "R", ylab = "OxD (Fraction Oxidized)", bty = 'l', col = colors4[1], lwd = 2)
 dev.off()
 ```
+
