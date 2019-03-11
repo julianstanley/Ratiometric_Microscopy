@@ -1,0 +1,3 @@
+Columns: Wavelength, pH 9.0
+Wavelength, pH 5.5
+pKa around 6.6

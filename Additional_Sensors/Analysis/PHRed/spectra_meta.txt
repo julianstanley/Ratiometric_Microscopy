@@ -1,0 +1,3 @@
+Columns: Wavelength, Flourescence at pH9
+Then wavelength, flourescence at pH5.5
+pKa appears to be around 7.8

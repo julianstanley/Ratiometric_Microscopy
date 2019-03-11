@@ -1,0 +1,107 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+source('createSensor.R')
+source('sensorHelpers.R')
+```
+
+```{r Initalize sensors}
+# Import phred/2 data
+phred_dat <- read.csv("PHRed/Spectra_phred.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+mkeima_dat <- read.csv("mKeima/spectra_mkeima.csv", header = FALSE, stringsAsFactors = FALSE, 
+                    fileEncoding="UTF-8-BOM")
+
+# Set known pKas
+phred_pka <- 7.8
+mkeima_pka <- 6.6
+
+# Get other properties
+phred_prop <- initSensor(phred_dat, c(435, 445), c(580, 590), pH = TRUE, pKa = phred_pka)
+mkeima_prop <- initSensor(mkeima_dat, c(435, 445), c(580, 590), pH = TRUE, pKa = mkeima_pka)
+
+```
+
+```{r show-sensor-values}
+values <- (data.frame(
+    c("Delta", "Rmin", "Rmax", "Rmax/Rmin", "Rmax - Rmin", "pKa", "Adjusted pKa"),
+    
+    c(phred_prop$delta,
+      phred_prop$Rmin,
+      phred_prop$Rmax,
+      phred_prop$Rmax/phred_prop$Rmin,
+      phred_prop$Rmax-phred_prop$Rmin,
+      phred_prop$pKa,
+      phred_prop$apKa),
+    
+    c(mkeima_prop$delta,
+      mkeima_prop$Rmin,
+      mkeima_prop$Rmax,
+      mkeima_prop$Rmax/mkeima_prop$Rmin,
+      mkeima_prop$Rmax-mkeima_prop$Rmin,
+      mkeima_prop$pKa,
+      mkeima_prop$apKa)
+    )
+    )
+
+colnames(values) <- c("Characteristic", "pHRed", "mKeima")
+knitr::kable(values, caption = "Characteristics", digits = 2)
+```
+
+```{r Plot spectra, fig.align='center', fig.height = 5, fig.width = 10}
+par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+
+plot(phred_prop$data$ox ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of pHRed", xlab = expression(lambda), ylab = "Emission (relative)", bty = 'L', lwd = 2, ylim = c(0,1))
+points(phred_prop$data$red ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[2], lwd = 2)
+
+legend("topleft", xpd=TRUE, c("Deprotenated", "Protenated"), pch = "-", lwd = 4, col = c(coolwarm(2)), cex = 1)
+
+plot(mkeima_prop$data$ox ~ mkeima_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of mKeima", xlab = expression(lambda), ylab = "Emission (relative)", bty = 'L', ylim = c(0, 1), lwd = 2)
+points(mkeima_prop$data$red ~ mkeima_prop$data$lambda, type = 'l', col = coolwarm(2)[2], lwd = 2)
+
+legend("topright", xpd=TRUE, c("Deprotenated", "Protenated"), pch = "-", lwd = 4, col = c(coolwarm(2)), cex = 1)
+```
+
+
+Actual spectra:
+
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap="Actual Spectra",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("PHRed/PHred_PNG.png", "mKeima/mKeima_PNG.png"))
+```
+
+
+```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 10}
+par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
+
+phred_deltas <- phred_prop$data$ox/phred_prop$data$red
+plot(phred_deltas ~ phred_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of phRed", xlab = expression(lambda), ylab = expression(delta), bty = 'L', xlim = c(500, 600), ylim = c(0, 2))
+
+mkeima_deltas <- mkeima_prop$data$ox/mkeima_prop$data$red
+plot(mkeima_deltas ~ mkeima_prop$data$lambda, type = 'l', col = 'black', main = "Delta profile of mKeima", xlab = expression(lambda), ylab = expression(delta), bty = 'L', xlim = c(500, 600), ylim = c(0, 2))
+```
+
+Taking delta at 585 nm, per literature
+
+```{r Phase Plot 2, fig.align='center', fig.height = 15, fig.width = 15}
+#par(pty = 's', mfrow = c(1,1), cex = 2)
+
+#colors <- coolwarm(9)
+
+#plot(~ error_4_R12, type = 'l', xlim = c(0, 5), col = colors4[3], lwd = 4, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = "")
+
+#points(gfp1iL_prop$E ~ error_4_iL, type = 'l', col = colors4[2], lwd = 4)
+#points(gfp1iE_prop$E ~ error_4_iE, type = 'l', col = colors4[1], lwd = 4)
+#points(gfp1_prop$E ~ error_4_1, type = 'l', col = colors4[4], lwd = 4)
+#points(gfp2_prop$E ~ error_4_2, type = 'l', col = colors[1], lwd = 4)
+
+#axis(side = 1, at = seq(0, 10, by = 0.1), 
+     #labels = FALSE, tcl = -0.2) 
+#axis(side = 2, at = seq(-320, -200, by = 1), 
+    # labels = FALSE, tcl = -0.2) 
+
+
+#legend("topleft", xpd=TRUE, c("roGFP1-R12", "roGFP2-iL", "roGFP1-iE", "roGFP1", "roGFP2"), pch = "-", lwd = 4, col = c(colors4[3:1], colors4[4], colors[1]), cex = 1)
+```
