@@ -135,7 +135,7 @@ Now, I'll do the same thing as last time, but I'll group all 57 worms. So each p
 ```{r}
 errors_registered <- subset(errors, errors$Strategy == 'Registered')
 errors_registered$error_sub <- abs(errors_registered$I1 - errors_registered$I2)
-ggplot(errors_registered, aes(y = error_sub, x = I2)) +
+ggplot(errors_registered, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
                 ggtitle("Errors with registered method show only relative error")
@@ -146,7 +146,7 @@ print(summary(lm(errors_registered$error_sub ~ errors_registered$I2)))
 ```{r}
 errors_cata <- subset(errors, errors$Strategy == 'Cata')
 errors_cata$error_sub <- abs(errors_cata$I1 - errors_cata$I2)
-ggplot(errors_cata, aes(y = error_sub, x = I2)) +
+ggplot(errors_cata, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
                 ggtitle("Errors with Cata's method show only absolute error")
@@ -157,7 +157,7 @@ print(summary(lm(errors_cata$error_sub ~ errors_cata$I2)))
 ```{r}
 errors_mid <- subset(errors, errors$Strategy == '2 Midlines')
 errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
-ggplot(errors_mid, aes(y = error_sub, x = I2)) +
+ggplot(errors_mid, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
                 ggtitle("Errors with 2 Midlines method shows mostly relative error")
@@ -168,7 +168,7 @@ print(summary(lm(errors_mid$error_sub ~ errors_mid$I2)))
 ```{r}
 errors_mid <- subset(errors, errors$Strategy == '1 Midlines')
 errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
-ggplot(errors_mid, aes(y = error_sub, x = I2)) +
+ggplot(errors_mid, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
                 ggtitle("Errors with 1 Midlines method shows mostly relative error")
