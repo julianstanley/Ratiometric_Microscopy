@@ -17,6 +17,9 @@ require(dplyr)
 require(plyr)
 require(knitr)
 require(ggplot2)
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
+
 ```
 
 ## Background
@@ -138,7 +141,8 @@ errors_registered$error_sub <- abs(errors_registered$I1 - errors_registered$I2)
 ggplot(errors_registered, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
-                ggtitle("Errors with registered method show only relative error")
+                ggtitle("Errors with registered method show only relative error") +
+                    scale_color_manual(values = cbp1)
 
 print(summary(lm(errors_registered$error_sub ~ errors_registered$I2)))
 ```
@@ -149,7 +153,8 @@ errors_cata$error_sub <- abs(errors_cata$I1 - errors_cata$I2)
 ggplot(errors_cata, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
-                ggtitle("Errors with Cata's method show only absolute error")
+                ggtitle("Errors with Cata's method show only absolute error") +
+                    scale_color_manual(values = cbp1)
 
 print(summary(lm(errors_cata$error_sub ~ errors_cata$I2)))
 ```
@@ -160,7 +165,8 @@ errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
 ggplot(errors_mid, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
-                ggtitle("Errors with 2 Midlines method shows mostly relative error")
+                ggtitle("Errors with 2 Midlines method shows mostly relative error") +
+                    scale_color_manual(values = cbp1)
 
 print(summary(lm(errors_mid$error_sub ~ errors_mid$I2)))
 ```
@@ -171,7 +177,8 @@ errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
 ggplot(errors_mid, aes(y = error_sub, x = I2, color = Region)) +
            geom_point() + 
             stat_smooth(method = "lm", col = "red") +
-                ggtitle("Errors with 1 Midlines method shows mostly relative error")
+                ggtitle("Errors with 1 Midlines method shows mostly relative error") +
+                    scale_color_manual(values = cbp1)
 
 print(summary(lm(errors_mid$error_sub ~ errors_mid$I2)))
 ```
