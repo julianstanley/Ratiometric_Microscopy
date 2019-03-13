@@ -122,7 +122,8 @@ results_table_significant <- data.frame(subset(results_table, (as.numeric(result
 colnames(results_table_significant) <- c("Animal Number", "Method", "Intercept", "P_Int", "Slope", "P_Slope", "Slope *  Intensity")
 print(paste("Total investigated: ", nrow(results_table)))
 print(paste("Total significant: ", nrow(results_table_significant)))
-kable(results_table_significant)
+print("The first few significant results:")
+kable(head(results_table_significant))
 ```
 
 We can see that, of 228 worm-technique pairs investigated, only 45 had slopes or intercepts that were significant. I think this is because there are just too few points per plot to make for a valid regression.
