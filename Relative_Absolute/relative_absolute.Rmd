@@ -1,0 +1,176 @@
+---
+title: "Is error relative to intensity?"
+author: "Julian Stanley"
+date: "March 12, 2019"
+output: 
+    html_document:
+        toc: true
+        toc_depth: 4
+        toc_float: true
+        dev: 'svg'
+        code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(dplyr)
+require(plyr)
+require(knitr)
+require(ggplot2)
+```
+
+## Background
+
+Let's say we two intensity measurements. $I_{True}$ is the true intensity value (in the case of our 410/410 experiments, we can arbitrarily call first of the two 410 images the "true" intensity). $I_{Obs}$ is the intensity value that we observe (again, we can call the second image the observed). 
+
+If the "observed" value has some absolute and some relative error in it, then we can say:
+
+$$ I_{True} = I_{Obs} \pm (I_{Obs} * \epsilon_{relative}) \pm \epsilon_{absolute} $$
+
+### Define error
+
+We can define an "error" as $I_{True} - I_{Obs}$, and then we get this:
+
+$$ I_{True} - I_{Obs} =  \pm (I_{Obs} * \epsilon_{relative}) \pm \epsilon_{absolute} $$
+
+### How do we know if error is relative to intensity or absolute?
+
+If we plot the "error" as a function of $I_{Obs}$, then $\epsilon_{relative}$ will be the slope and $\epsilon_{absolute}$ will be the intercept. 
+
+### Why do we care whether error is relative to intensity?
+
+Given what we know about error relative to intensity, what does error in R look like?
+
+Well, assuming that relative and absolute errors are independent of wavelength:
+
+$$ R_{Obs} = \frac{I_{True, 410} \pm (I_{True, 410} * \epsilon_{relative}) \pm \epsilon_{absolute}}
+                    {I_{True, 470} \pm (I_{True, 470} * \epsilon_{relative}) \pm \epsilon_{absolute}} $$
+                    
+That's complicated. 
+                    
+#### Assume most error is relative to intensity
+
+Let's say that most of our error is relative (formally, $\epsilon_{absolute} << \epsilon_{relative} * I_{Obs}$). Then, 
+
+$$ R_{Obs} = \frac{I_{True, 410} \pm (I_{True, 410} * \epsilon_{relative}) }
+                    {I_{True, 470} \pm (I_{True, 470} * \epsilon_{relative})}  = $$ 
+                    
+$$ R_{Obs} = \frac{I_{True, 410} (1 \pm \epsilon_{relative}) }
+                    {I_{True, 470} (1 \pm  \epsilon_{relative})}  = $$ 
+                    
+$$ R_{Obs} = \frac{I_{True, 410} (1 \pm \epsilon_{relative}) }
+                    {I_{True, 470} (1 \pm  \epsilon_{relative})}  = $$ 
+                    
+$$ R_{Obs} = R_{True}*\frac{(1 \pm \epsilon_{relative}) }
+                    {(1 \pm  \epsilon_{relative})} $$ 
+                    
+The case of relative error would be really nice, because then our observed R is a function of the true R, which makes all of my analysis possible.
+
+#### Assume we get the same error regardless of intensity
+
+But, if our error in intensity is absolute, things aren't as nice: 
+
+$$ R_{Obs} = \frac{I_{True, 410} \pm \epsilon_{absolute}}
+                    {I_{True, 470} \pm \epsilon_{absolute}} $$
+
+In that case, our observed R is not longer a function of the true R--this would make error propagation less straightforward.
+
+So, let's investigate whether error depends on intensity.
+
+## Analyzing each worm indidividually is underpowered
+
+We have a table of 410/410 worms aligned with different techniques. Each has a I1 intensity and an I2 intensity.
+
+```{r}
+errors <- read.csv("errors_table.csv", header = TRUE)
+kable(head(errors))
+print(summary(errors[c(1, 3, 4, 5, 6)]))
+```
+
+We have 4 different techniques whereby we've aligned the two 410 images. So, at the very least, we should analyze each technique seperately. But also, maybe it's good to look at each individual worm.
+
+So, for each worm, I will look at the measurements of prePM7, pm7. pm6, pm5, pm4. pm3, and the medial axis, and plot those errors (I1 - I2) as a function of observed intensity (I2). 
+
+I'll then take that graph and fit a linear model to it, and print the results of that model into a table. 
+
+```{r}
+results_table <- c()
+
+for (animal in unique(errors$Animal)) {
+    for (strategy in unique(errors$Strategy)) {
+    error_table <- filter(errors, Animal == animal & Strategy == strategy)
+    average_intensity <- error_table$I2
+    error <- abs(error_table$I1 - error_table$I2)
+    lm <- lm(error ~ average_intensity)
+    intercept <- as.numeric(coef(lm)['(Intercept)'])
+    p_intercept <- as.numeric(summary(lm)$coefficients[,4]['(Intercept)'])
+    slope <- as.numeric(coef(lm)['average_intensity'])
+    p_slope <- as.numeric(summary(lm)$coefficients[,4]['average_intensity'])
+    
+    results_table <- rbind(results_table, c(animal, strategy, 
+                                            round(as.numeric(intercept), 2), 
+                                            round(as.numeric(p_intercept), 2), 
+                                            round(as.numeric(slope), 2),
+                                            round(as.numeric(p_slope), 2), 
+                                            round(as.numeric(slope * mean(average_intensity)), 2)))
+    }
+}
+
+results_table_df <- data.frame(results_table)
+colnames(results_table_df) <- c("Animal Number", "Method", "Intercept", "P_Int", "Slope", "P_Slope", "Slope * Intensity")
+results_table_significant <- data.frame(subset(results_table, (as.numeric(results_table[,4]) < 0.05) | (as.numeric(results_table[,6]) < 0.05)))
+colnames(results_table_significant) <- c("Animal Number", "Method", "Intercept", "P_Int", "Slope", "P_Slope", "Slope *  Intensity")
+print(paste("Total investigated: ", nrow(results_table)))
+print(paste("Total significant: ", nrow(results_table_significant)))
+kable(results_table_significant)
+```
+
+We can see that, of 228 worm-technique pairs investigated, only 45 had slopes or intercepts that were significant. I think this is because there are just too few points per plot to make for a valid regression.
+
+## Cata's alignment hints at absolute, whereas the others say relative
+
+Now, I'll do the same thing as last time, but I'll group all 57 worms. So each plot will have 57 (Error, Intensity) points that were obtained from a single strategy. 
+
+```{r}
+errors_registered <- subset(errors, errors$Strategy == 'Registered')
+errors_registered$error_sub <- abs(errors_registered$I1 - errors_registered$I2)
+ggplot(errors_registered, aes(y = error_sub, x = I2)) +
+           geom_point() + 
+            stat_smooth(method = "lm", col = "red") +
+                ggtitle("Errors with registered method show only relative error")
+
+print(summary(lm(errors_registered$error_sub ~ errors_registered$I2)))
+```
+
+```{r}
+errors_cata <- subset(errors, errors$Strategy == 'Cata')
+errors_cata$error_sub <- abs(errors_cata$I1 - errors_cata$I2)
+ggplot(errors_cata, aes(y = error_sub, x = I2)) +
+           geom_point() + 
+            stat_smooth(method = "lm", col = "red") +
+                ggtitle("Errors with Cata's method show only absolute error")
+
+print(summary(lm(errors_cata$error_sub ~ errors_cata$I2)))
+```
+
+```{r}
+errors_mid <- subset(errors, errors$Strategy == '2 Midlines')
+errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
+ggplot(errors_mid, aes(y = error_sub, x = I2)) +
+           geom_point() + 
+            stat_smooth(method = "lm", col = "red") +
+                ggtitle("Errors with 2 Midlines method shows mostly relative error")
+
+print(summary(lm(errors_mid$error_sub ~ errors_mid$I2)))
+```
+
+```{r}
+errors_mid <- subset(errors, errors$Strategy == '1 Midlines')
+errors_mid$error_sub <- abs(errors_mid$I1 - errors_mid$I2)
+ggplot(errors_mid, aes(y = error_sub, x = I2)) +
+           geom_point() + 
+            stat_smooth(method = "lm", col = "red") +
+                ggtitle("Errors with 1 Midlines method shows mostly relative error")
+
+print(summary(lm(errors_mid$error_sub ~ errors_mid$I2)))
+```
