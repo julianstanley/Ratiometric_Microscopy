@@ -155,6 +155,14 @@ combine <- function(ox_lambda, ox_value, red_lambda, red_value) {
     
 }
 
+# Define a function to modify with non-limiting data
+spectra_adjust <- function(state_1_spectra, state_2_spectra, state_1_fraction, state_2_fraction) {
+    A <- (state_1_spectra/state_1_fraction-state_2_spectra/state_2_fraction)/((1-state_1_fraction)/state_1_fraction-(1-state_2_fraction)/state_2_fraction)
+    B <- (state_1_spectra/(1-state_1_fraction)-state_2_spectra/(1-state_2_fraction))/(state_1_fraction/(1-state_1_fraction)-state_2_fraction/(1-state_2_fraction))
+    
+    return(matrix(c(A,B), ncol = 2))
+}
+
 #Define coolwarm color gradient
 coolwarm <- colorRampPalette(c(
     rgb( 60, 81,198, maxColorValue = 255),

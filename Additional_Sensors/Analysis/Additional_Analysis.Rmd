@@ -8,12 +8,23 @@ source('createSensor.R')
 source('sensorHelpers.R')
 ```
 
+
 ```{r Initalize sensors}
 # Import phred/2 data
 phred_dat <- read.csv("PHRed/Spectra_phred.csv", header = FALSE, stringsAsFactors = FALSE, 
                     fileEncoding="UTF-8-BOM")
+
+combined_phred <- combine(ox_lambda = phred_dat$V1, ox_value = phred_dat$V2, red_lambda = na.omit(phred_dat$V3), red_value = na.omit(phred_dat$V4))
+
+adjusted_phred <- spectra_adjust(combined_phred$ox, combined_phred$red, get_frDeprot(9.0, 7.8), get_frDeprot(5.5, 7.8))
+
+# Modify phred spectra based on pH shown
 mkeima_dat <- read.csv("mKeima/spectra_mkeima.csv", header = FALSE, stringsAsFactors = FALSE, 
                     fileEncoding="UTF-8-BOM")
+
+combined_mkeima <- combine(ox_lambda = mkeima_dat$V1, ox_value = mkeima_dat$V2, red_lambda = na.omit(mkeima_dat$V3), red_value = na.omit(mkeima_dat$V4))
+
+adjusted_mkeima <- spectra_adjust(combined_mkeima$ox, combined_mkeima$red, get_frDeprot(9.0, 6.6), get_frDeprot(5.5, 6.6))
 
 # Set known pKas
 phred_pka <- 7.8
@@ -54,8 +65,9 @@ knitr::kable(values, caption = "Characteristics", digits = 2)
 ```{r Plot spectra, fig.align='center', fig.height = 5, fig.width = 10}
 par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
 
-plot(phred_prop$data$ox ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of pHRed", xlab = expression(lambda), ylab = "Emission (relative)", bty = 'L', lwd = 2, ylim = c(0,1))
-points(phred_prop$data$red ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[2], lwd = 2)
+plot(phred_prop$data$ox ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[1], main = "Emission spectrum of pHRed", xlab = expression(lambda), ylab = "Emission (relative)", bty = 'L', lwd = 0.2, ylim = c(0,1))
+points(phred_prop$data$red ~ phred_prop$data$lambda, type = 'l', col = coolwarm(2)[2], lwd = 0.2)
+points(adjusted_phred[,1] ~ combined_phred$lambda, type = 'l', col = "purple", lwd = 0.2)
 
 legend("topleft", xpd=TRUE, c("Deprotenated", "Protenated"), pch = "-", lwd = 4, col = c(coolwarm(2)), cex = 1)
 
