@@ -1,0 +1,195 @@
+---
+title: "Oh the pHs you will see"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+    code_folding: hide
+  md_document: default
+  #word_document: default
+editor_options:
+  chunk_output_type: inline
+---
+
+## Document setup options
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=55),tidy=TRUE)
+shh <- suppressPackageStartupMessages
+shh(require(sensorOverlord))
+shh(require(ggplot2))
+shh(require(cowplot))
+shh(require(stringr))
+shh(require(ggalt))
+```
+
+## Initalize Sensors 
+```{r Initalize_Sensors}
+sensor_repo <- ""
+
+# phRed
+phRed_data <- read.csv(paste(sensor_repo, "spectra_phred.csv", sep = ""), header = FALSE)
+phred_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = phRed_data$V3, 
+    values_minimum = phRed_data$V4,
+    lambdas_maximum = phRed_data$V1,
+    values_maximum = phRed_data$V2)
+phred_sensor <- new("pHSensor", newSensorFromSpectra(phred_spectra,
+                                     lambda_1 = c(400, 420), lambda_2 = c(575, 585)), 
+                    pKa = 7.8)
+
+#mkeima
+mkeima_data <- read.csv(paste(sensor_repo, "spectra_mkeima.csv", sep = ""), header = FALSE)
+mkeima_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = mkeima_data$V3, 
+    values_minimum = mkeima_data$V4,
+    lambdas_maximum = mkeima_data$V1,
+    values_maximum = mkeima_data$V2)
+mkeima_sensor <- new("pHSensor", newSensorFromSpectra(mkeima_spectra,
+                                     lambda_1 = c(400, 420), lambda_2 = c(575, 585)),
+                 pKa = 6.6)
+
+#deGFP1
+degfp1_data <- read.csv(paste(sensor_repo, "spectra_deGFP1.csv", sep = ""), header = FALSE)
+degfp1_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = degfp1_data$V3, 
+    values_minimum = degfp1_data$V4,
+    lambdas_maximum = degfp1_data$V1,
+    values_maximum = degfp1_data$V2)
+degfp1_sensor <- new("pHSensor", newSensorFromSpectra(degfp1_spectra,
+                                     lambda_1 = c(450, 470), lambda_2 = c(500, 520)),
+                     pKa = 8.02)
+
+#deGFP4
+degfp4_data <- read.csv(paste(sensor_repo, "spectra_deGFP4.csv", sep = ""), header = FALSE)
+degfp4_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = degfp4_data$V3, 
+    values_minimum = degfp4_data$V4,
+    lambdas_maximum = degfp4_data$V1,
+    values_maximum = degfp4_data$V2)
+degfp4_sensor <- new("pHSensor", newSensorFromSpectra(degfp4_spectra,
+                                     lambda_1 = c(450, 470), lambda_2 = c(500, 520)),
+                     pKa = 7.34)
+```
+
+## All
+
+```{r, fig.width = 10, fig.height = 10}
+phRed_spectraPlot <- plotSpectra(phred_spectra, "Deprotenated", "Protenated") + ggtitle("pHRed")
+mkeima_spectraPlot <- plotSpectra(mkeima_spectra, "Deprotenated", "Protenated") + ggtitle("mKeima")
+degfp1_spectraPlot <- plotSpectra(degfp1_spectra,  "Deprotenated", "Protenated") + ggtitle("deGFP1")
+degfp4_spectraPlot <- plotSpectra(degfp4_spectra,  "Deprotenated", "Protenated") + ggtitle("deGFP4")
+
+
+plot_grid(phRed_spectraPlot, mkeima_spectraPlot, degfp1_spectraPlot, degfp4_spectraPlot, ncol = 2)
+```
+
+
+
+```{r}
+q <- function(...) {
+  sapply(match.call()[-1], deparse)
+}
+
+sensorList <- q(degfp1_sensor, degfp4_sensor, mkeima_sensor, phred_sensor)
+```
+
+
+```{r}
+acceptable_error <- 0.1
+error_model <- function(x) {return(0.03*x)}
+
+minMaxMatrix <- c()
+sensors <- c()
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+    sensors <- c(sensors, sensorName)
+    error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getpH, Error_Model = error_model)
+    
+    error_filter <- subset(error_data, 
+                           error_data$max_abs_error < acceptable_error)
+    
+    minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+    maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+    minMaxMatrix <- rbind(minMaxMatrix, c(round(minimum, 2), round(maximum,2)))
+}
+ranges <- data.frame(minMaxMatrix)
+ranges$Sensor_Name <- sensors
+colnames(ranges) <- c("Minimum", "Maximum", "Sensor_Name")
+```
+
+
+```{r}
+theme_set(theme_classic())
+
+ranges$Sensor_Name <- factor(ranges$Sensor_Name, 
+                            levels=as.character(ranges$Sensor_Name))
+
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=0.75) +
+           labs( 
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.03R", 
+             subtitle="") +
+    scale_x_continuous("pH", limits = c(1, 14), breaks = 1:14) +
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              plot.background=element_rect(fill="#f7f7f7"),
+              panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank())
+          #axis.text.x = element_text(angle = 90, hjust = 1))
+plot(gg)
+```
+
+```{r pHobs_pHexp_plots, echo = FALSE, fig.width=10, fig.height=10}
+par(pty = 's', mfrow = c(2, 2))
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+    
+    sensor_errors <- getErrorTable(sensor, R = getR(sensor, by = 0.001), 
+                                   Error_Model = function(x){return(x * 0.03)}, 
+                                   FUN = getpH)
+    
+    sensor_errors$lower_error_neg <- (sensor_errors$lower_error * -1)
+    sensor_errors$lower_value <- (sensor_errors$FUN_true + sensor_errors$lower_error_neg)
+    sensor_errors$upper_value <- (sensor_errors$FUN_true + sensor_errors$upper_error)
+
+    plot(sensor_errors$lower_value ~ sensor_errors$FUN_true , type = 'l', 
+     ylim = c(4, 10), xlim = c(4, 10), lwd = 1, main = sensorName,
+     xlab = "True pH",
+     ylab =  "Observed pH")
+    
+    points(sensor_errors$upper_value ~sensor_errors$FUN_true, type = "l", lwd = 1)
+    values_actual <- sensor_errors$FUN_true
+    values_top <- sensor_errors$upper_value
+    values_bottom <- sensor_errors$lower_value
+    trim <- round(length(values_actual)/30)
+    limits <- c(trim, length(values_actual)-trim)
+    print(sensorName)
+    polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y =   c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+    legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+        
+    assign(paste(sensorName, "_pHplot", sep = ""), recordPlot())
+    
+
+    plot(sensor_errors$FUN_true ~ sensor_errors$max_abs_error, type = 'l', xlim = c(0, 1), ylim = c(4, 10), col = "black", lwd = 2, bty = 'l', xlab = "Expected accuracy (pH)", ylab = "pH", main = sensorName)
+    axis(side = 1, at = seq(0, 1, by = 0.01), 
+         labels = FALSE, tcl = -0.2) 
+    axis(side = 2, at = seq(4, 10, by = 0.1), 
+         labels = FALSE, tcl = -0.2) 
+     assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
+}
+```

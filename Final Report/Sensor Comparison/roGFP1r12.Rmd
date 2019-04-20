@@ -1,6 +1,6 @@
 ---
 output:
- pdf_document: default
+    html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -367,6 +367,18 @@ OXD_470 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop
 
 OXD_490 <- OXD(R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 489 & gfpr12_deltas_df$lambda < 491)[1])
 
+E_390 <- E(e0 = -265, R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 389 & gfpr12_deltas_df$lambda < 391)[1])
+
+E_410 <- E(e0 = -265,R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 409 & gfpr12_deltas_df$lambda < 411)[1])
+
+E_430 <- E(e0 = -265,R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 429 & gfpr12_deltas_df$lambda < 431)[1])
+
+E_450 <- E(e0 = -265,R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 449 & gfpr12_deltas_df$lambda < 451)[1])
+
+E_470 <- E(e0 = -265,R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 469 & gfpr12_deltas_df$lambda < 471)[1])
+
+E_490 <- E(e0 = -265,R = gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, delta = subset(gfpr12_deltas_df$deltas, gfpr12_deltas_df$lambda > 489 & gfpr12_deltas_df$lambda < 491)[1])
+
 plot(OXD_490 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[1])
 points(OXD_470 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[2])
 points(OXD_450 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[3])
@@ -375,6 +387,13 @@ points(OXD_410 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[5])
 points(OXD_390 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[6])
 
 legend("bottomright", title = expression(lambda[2]), xpd=TRUE, c("490", "470", "450", "430", "410", "390"), pch = "-", lwd = 4, col = colors, cex = 1)
+
+plot(E_490 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[1])
+points(E_470 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[2])
+points(E_450 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[3])
+points(E_430 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[4])
+points(E_410 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[5])
+points(E_390 ~ gfp1r12_prop$RDoublePrime, type = 'l', col = colors[6])
 ```
 
 ```{r Initalize two sets of roGFP1-R12}
@@ -591,6 +610,28 @@ points(gfp1r12_prop$E ~ error_4, type = 'l', col = colors[9], lwd = 2)
 
 
 legend("right", title = "Empircal precision in R", xpd=TRUE, c("2%", "3%", "4%"), pch = "-", lwd = 4, col = c(colors[7:9]), cex = 1)
+```
+
+```{r Phase Plot Delta, fig.align='center', fig.height = 5, fig.width = 5}
+par(pty = 's', mfrow = c(1,1), mai = c(0.4, 0.8, 0.4, 0.8))
+
+error_2 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = 800, percent_error = 3)
+error_3 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = 1, percent_error = 3)
+error_4 = Error_E(gfp1r12_prop$R, Rmin = gfp1r12_prop$Rmin, Rmax = gfp1r12_prop$Rmax, e0 = gfp1r12_prop$e0, delta = 0.125, percent_error = 3)
+colors <- coolwarm(9)
+
+plot(gfp1r12_prop$E ~ error_2, type = 'l', xlim = c(0, 5), ylim = c(-500, -220), col = colors[7], lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = "")
+axis(side = 1, at = seq(0, 5, by = 0.1), 
+     labels = FALSE, tcl = -0.2) 
+axis(side = 2, at = seq(-300, -200, by = 5), 
+     labels = FALSE, tcl = -0.2) 
+points(gfp1r12_prop$E ~ error_3, type = 'l', col = colors[8], lwd = 2)
+points(gfp1r12_prop$E ~ error_4, type = 'l', col = colors[9], lwd = 2)
+#points(x = c(2,2), y = (c(-220, -300)), type = "l")
+#points(x = c(min(error_2), min(error_2)), y = (c(-200, -300)), type = "l")
+
+
+legend("right", title = expression(delta), xpd=TRUE, c("8", "1", "1/8"), pch = "-", lwd = 4, col = c(colors[7:9]), cex = 1)
 ```
 
 

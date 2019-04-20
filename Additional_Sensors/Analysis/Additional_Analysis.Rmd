@@ -87,7 +87,6 @@ knitr::include_graphics(c("PHRed/PHred_PNG.png", "mKeima/mKeima_PNG.png"))
 Now we can adjust the specra based on the pKa.
 
 
-
 ```{r Plot deltas, fig.align='center', fig.height = 5, fig.width = 10}
 par(pty = 's', mfrow = c(1,2), mai = c(0.4, 0.8, 0.4, 0.8))
 

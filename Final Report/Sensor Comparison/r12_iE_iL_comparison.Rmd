@@ -1,7 +1,6 @@
 ---
 output:
- prettydoc::html_pretty:
-     theme: architect
+ pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -248,7 +247,7 @@ iL_dat <- read.csv("iL/Spectra_iL_CSV.csv", header = FALSE, stringsAsFactors = F
                     fileEncoding="UTF-8-BOM")
 gfp1_dat <- read.csv("rogfp1.csv", header = FALSE, stringsAsFactors = FALSE, 
                     fileEncoding="UTF-8-BOM")
-gfp2_dat <- read.csv("rogfp2.csv", header = FALSE, stringsAsFactors=FALSE,
+gfp2_dat <- read.csv("rogfp2.csv", header = TRUE, stringsAsFactors=FALSE,
                      fileEncoding="UTF-8-BOM")
 
 # Set known midpoint potentials

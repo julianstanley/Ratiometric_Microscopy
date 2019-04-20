@@ -1,0 +1,2 @@
+deGFP1: pka=8.02
+deGFP4: pka=7.34

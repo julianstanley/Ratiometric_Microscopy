@@ -163,6 +163,10 @@ spectra_adjust <- function(state_1_spectra, state_2_spectra, state_1_fraction, s
     return(matrix(c(A,B), ncol = 2))
 }
 
+get_frDeprot <- function(pH, pKa) {
+    return(10^(pH-pKa)/(1 + 10^(pH-pKa)))
+}
+
 #Define coolwarm color gradient
 coolwarm <- colorRampPalette(c(
     rgb( 60, 81,198, maxColorValue = 255),
