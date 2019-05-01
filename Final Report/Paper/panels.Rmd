@@ -1,0 +1,205 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(cowplot)
+library(sensorOverlord)
+```
+
+# Distribution of errors
+
+```{r errors}
+tbp_errors <- read.table("../../Error_Story/Javier Data/cata_tbp.csv", 
+                    sep = ",", header = TRUE)
+
+tbp_errors_baseline <- subset(tbp_errors, tbp_errors$baseline == 'Y')
+
+baseline_combined <- as.numeric(
+  as.vector(as.matrix(tbp_errors_baseline[,4:67])))
+
+# Remove outlier
+baseline_combined <- 
+  baseline_combined[!baseline_combined == max(baseline_combined)]
+
+# Histogram and cumulative probability 
+
+ggplot(data.frame(baseline_combined), aes(x = baseline_combined)) +
+  geom_histogram(binwidth=0.005)
+range <- quantile(baseline_combined, probs = c(0.025, 0.975))
+
+ggplot(data.frame(baseline_combined), aes(x = baseline_combined)) +
+  stat_ecdf(geom="step") +
+  xlab("Residual") +
+  ylab("Cumulative probability")
+
+print(paste("95% of values fall between", round(range[[1]], 3), "and", 
+            round(range[[2]], 3), sep = " "))
+```
+
+
+# E observed vs R at different error levels
+
+```{r}
+db <- getDb()
+roGFP1_R12_data <- db$find('{"sensor_name" : "roGFP1_R12"}')
+roGFP1_R12_sensor <- new("redoxSensor",
+                           newSensorFromSpectra(
+                           spectraMatrixFromValues(roGFP1_R12_data$lambda_min[[1]],
+                                                   roGFP1_R12_data$values_min[[1]],
+                                                   roGFP1_R12_data$lambda_max[[1]],
+                                                   roGFP1_R12_data$values_max[[1]]),
+                           lambda_1 = c(395, 425), 
+                           lambda_2 = c(460, 480)),
+                           e0 = roGFP1_R12_data$sensor_midpoint[[1]])
+
+error_model_generator <- function(abs_error) {
+  return(function(x) {return(abs_error)})
+}
+
+plotdf <- data.frame()
+sensor <- roGFP1_R12_sensor
+errors <- c(0.01, 0.02, 0.027, 0.029, 0.03)
+errors <- c(0.027,0.029, 0.05, 0.1, 0.2)
+for (error in errors) {
+  R <- getR(sensor)
+  error_table <- getErrorTable(sensor, R = R, FUN = getE,
+                               Error_Model = error_model_generator(error))
+  
+  error_upper_rep <- rep(paste(error, 'upper', sep = "_"), length(R))
+  error_lower_rep <- rep(paste(error, 'lower', sep = "_"), length(R))
+  
+  E_obs <- c(error_table$FUN_true + error_table$upper_error, 
+             error_table$FUN_true - error_table$lower_error)
+  
+  E_obs <- sapply(E_obs, function(x) replace(x, is.infinite(x),NA))
+  
+  new_df <- data.frame(R = rep(R, 2), error = c(error_table$upper_error,
+                                                 -1*error_table$lower_error),
+                       error_model = c(error_upper_rep, error_lower_rep),
+                       E_obs = E_obs)
+  
+  plotdf <- rbind(plotdf, new_df)
+}
+
+cbbPalette <- c("#D55E00", "#D55E00",
+                "#E69F00", "#E69F00", 
+                "#56B4E9", "#56B4E9", 
+                "#009E73", "#009E73",
+                "#D55E00", "#D55E00",
+                "#000000", "#000000")
+
+E_base <- getE(sensor)
+R_base <- getR(sensor)
+ggplot() +
+  geom_line(aes(x = R_base, y = E_base)) +
+  geom_line(data=plotdf, aes(x = R, y = E_obs, col = error_model), na.rm = TRUE, size = 0.4) +
+  ylab("Error in E") +
+  ylim(c(-315,-175)) +
+  scale_color_manual(values=cbbPalette)
+
+ggplot(plotdf, aes(x = R, y = error, col = error_model)) +
+  geom_line(na.rm = TRUE, size = 1) +
+  ylim(c(-2, 2)) +
+  ylab("Error in E") +
+  scale_color_manual(values=cbbPalette)
+
+```
+
+# Phase plot (for absolute error of 0.03)
+
+```{r}
+R <- getR(sensor)
+
+error <- 0.03
+error_table <- getErrorTable(sensor, R = R, FUN = getE,
+                               Error_Model = error_model_generator(error))
+  
+error_df <- data.frame(R = R, error = error_table$max_abs_error,
+                       E = error_table$FUN_true)
+  
+ggplot(error_df, aes(y = error, x = E)) +
+  geom_line(na.rm=TRUE) +
+  ylim(c(0,1)) +
+  xlim(c(-300, -200)) +
+  coord_flip()
+```
+
+# Sanity check: using percent errors
+
+Note: All of the previous graphs were using **absolute** errors. Those
+looked small, so here are all the exact same graphs, but just with **relative**/
+**percent** errors instead.
+
+```{r sanity check}
+error_model_generator <- function(abs_error) {
+  return(function(x) {return(abs_error*x)})
+}
+
+plotdf <- data.frame()
+sensor <- roGFP1_R12_sensor
+for (error in c(0.01, 0.02, 0.027, 0.029, 0.03)) {
+  R <- getR(sensor)
+  error_table <- getErrorTable(sensor, R = R, FUN = getE,
+                               Error_Model = error_model_generator(error))
+  
+  error_upper_rep <- rep(paste(error, 'upper', sep = "_"), length(R))
+  error_lower_rep <- rep(paste(error, 'lower', sep = "_"), length(R))
+  
+  E_obs <- c(error_table$FUN_true + error_table$upper_error, 
+             error_table$FUN_true - error_table$lower_error)
+  
+  E_obs <- sapply(E_obs, function(x) replace(x, is.infinite(x),NA))
+  
+  new_df <- data.frame(R = rep(R, 2), error = c(error_table$upper_error,
+                                                 -1*error_table$lower_error),
+                       error_model = c(error_upper_rep, error_lower_rep),
+                       E_obs = E_obs)
+  
+  plotdf <- rbind(plotdf, new_df)
+}
+
+cbbPalette <- c("#000000", "#000000", 
+                "#E69F00", "#E69F00", 
+                "#56B4E9", "#56B4E9", 
+                "#009E73", "#009E73",
+                "#D55E00", "#D55E00",
+                "#000000", "#000000")
+
+E_base <- getE(sensor)
+R_base <- getR(sensor)
+ggplot() +
+  geom_line(aes(x = R_base, y = E_base)) +
+  geom_line(data=plotdf, aes(x = R, y = E_obs, col = error_model), na.rm = TRUE, size = 0.4) +
+  ylab("Error in E") +
+  ylim(c(-300,-200)) +
+  scale_color_manual(values=cbbPalette)
+
+ggplot(plotdf, aes(x = R, y = error, col = error_model)) +
+  geom_line(na.rm = TRUE, size = 1) +
+  ylim(c(-2, 2)) +
+  ylab("Error in E") +
+  scale_color_manual(values=cbbPalette)
+
+```
+
+# Phase plot (for relative error of R*0.03)
+```{r}
+R <- getR(sensor)
+
+error <- 0.03
+error_table <- getErrorTable(sensor, R = R, FUN = getE,
+                               Error_Model = error_model_generator(error))
+  
+error_df <- data.frame(R = R, error = error_table$max_abs_error,
+                       E = error_table$FUN_true)
+  
+ggplot(error_df, aes(y = error, x = E)) +
+  geom_line(na.rm=TRUE) +
+  ylim(c(0,3)) +
+  xlim(c(-300, -200)) +
+  coord_flip()
+```
+

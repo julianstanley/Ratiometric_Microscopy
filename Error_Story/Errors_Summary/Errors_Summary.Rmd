@@ -1,0 +1,98 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+# Data Setup
+
+```{r setupData}
+# Setup Sean's data
+errors_sean <- read.csv("errors_table.csv", header = TRUE)
+errors_sean$R <- errors_sean$I1 / errors_sean$I2
+
+# Get the standard deviation for each animal in Sean's data
+sean_sd <- aggregate(errors_sean$R, by = list(errors_sean$Animal), FUN = sd)
+colnames(sean_sd) <- c("Animal", "stddev")
+
+# Get the preformatted tidy data
+tidydf <- read.csv("Tidy_Errors.csv", header = TRUE)
+
+# Format sean's data to match the tidy data
+sean_sd$Animal <- NULL
+colnames(sean_sd) <- c("std_dev")
+sean_sd$mean_R <- rep(1000, 57)
+sean_sd$experiment <- rep("sean_410410", 57)
+sean_sd$condition <- rep("Baseline", 57)
+
+# Combine the preformatted tidy data with Sean's
+tidydf <- suppressWarnings(full_join(tidydf, sean_sd))
+
+# Fix the standard deviations and Rs to a set unit
+fixed_sd <- c(
+    subset(tidydf, tidydf$experiment == "cata_cali")$std_dev,
+    subset(tidydf, tidydf$experiment == "jodie_cali")$std_dev,
+    subset(tidydf, tidydf$experiment == "tbuooh_fit")$std_dev * 1000,
+    subset(tidydf, tidydf$experiment == "sean_410410")$std_dev * 1000
+)/1000
+
+tidydf$std_dev <- fixed_sd
+
+tidydf$mean_R <- tidydf$mean_R/1000
+# Print out the final product
+knitr::kable(summary(tidydf))
+knitr::kable(unique(tidydf$experiment), col.names = c("Experiments"))
+knitr::kable(unique(tidydf$condition), col.names = c("Conditions"))
+```
+
+# Standard deviations between conditions
+
+```{r boxplots}
+ggplot(tidydf, aes(x = factor(condition), y = std_dev, fill = experiment))+
+    geom_dotplot(binaxis = 'y', stackdir = 'center',
+                 dotsize = 0.5, binwidth = 0.0018) +
+    scale_fill_discrete(name = "Experiment", labels = 
+                            c("Calibration (Cata)", "Calibration (Jodie)", 
+                              "Fixed R", "Functionalized")) +
+    xlab("") +
+    scale_x_discrete(labels = c("Baseline", "Diamide (50mM)", 
+                                "DTT (100mM)", "t-buooh (5mM)")) +
+    ylab("Standard Deviation (R)") +
+    theme(text=element_text(size = 16), 
+          axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+# Within conditions, R and standard deviation seem independent
+
+```{r error_type}
+tidydf_baseline <- subset(tidydf, tidydf$condition == "Baseline")
+plot(tidydf_baseline$std_dev ~ tidydf_baseline$mean_R, 
+     xlab = "R", ylab = "Standard Deviation (R)", main = "Baseline")
+legend("topright", bty="n", legend=paste("R^2 is", 
+        format(summary(
+            lm(tidydf_baseline$std_dev ~ 
+                   tidydf_baseline$mean_R))$adj.r.squared, digits=2)))
+
+tidydf_diamide <- subset(tidydf, tidydf$condition == "Diamide_50mM" 
+                         & tidydf$experiment == "cata_cali")
+plot(tidydf_diamide$std_dev ~ tidydf_diamide$mean_R,
+      xlab = "R", ylab = "Standard Deviation (R)", main = "Diamide")
+legend("topright", bty="n", legend=paste("R^2 is", 
+        format(summary(
+            lm(tidydf_diamide$std_dev ~ 
+                   tidydf_diamide$mean_R))$adj.r.squared, digits=2)))
+
+tidydf_DTT <- subset(tidydf, tidydf$condition == "DTT_100mM")
+plot(tidydf_DTT$std_dev ~ tidydf_DTT$mean_R,
+      xlab = "R", ylab = "Standard Deviation (R)", main = "DTT")
+legend("topright", bty="n", legend=paste("R^2 is", 
+        format(summary(
+            lm(tidydf_diamide$std_dev ~ 
+                   tidydf_diamide$mean_R))$adj.r.squared, digits=2)))
+
+```

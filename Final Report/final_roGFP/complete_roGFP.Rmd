@@ -1,4 +1,4 @@
----
+    ---
 title: "Oh the roGFPs you will see"
 output:
     pdf_document: default
@@ -198,7 +198,7 @@ minMaxMatrix <- c()
 for (sensorName in sensorList) {
     sensor <- get(sensorName)
     sensorName <- str_replace(sensorName, "_sensor", "")
-    error_data <- getErrorTable(sensor, R = getR(sensor), 
+    error_data2 <- getErrorTable(sensor, R = getR(sensor), 
                                 FUN = getE, Error_Model = error_model)
     
     error_filter <- subset(error_data, 
@@ -217,6 +217,37 @@ ranges <- data.frame(minMaxMatrix)
 colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum")
 ```
 
+```{r}
+error_model <- function(x) {return(0.05*x)}
+error_data1 <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+
+error_model <- function(x) {return(0.05)}
+error_data2 <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+
+error_model <- function(x) {return(0.05 + 0.05*x)}
+error_data3 <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+
+
+#plot(error_data1$FUN_true ~ error_data1$R, type = 'l', ylim = c(-280, -220))
+
+redCol <- "#FF4E47"
+blueCol <- "#4335E8"
+greenCol <- "#58FF6E"
+
+plot(error_data1$upper_error ~ error_data1$R, type = 'l',col = redCol, ylim = c(-20,20))
+points(error_data1$lower_error ~ error_data1$R, type = 'l', col = redCol)
+points(error_data2$upper_error ~ error_data2$R, type = 'l', lty = "dashed", col = blueCol)
+points(error_data2$lower_error ~ error_data2$R, type = 'l',  lty = "dashed", col = blueCol)
+points(error_data3$upper_error ~ error_data2$R, type = 'l',col = greenCol)
+points(error_data3$lower_error ~ error_data2$R, type = 'l',  col = greenCol)
+
+legend("bottom", legend = c("0.05R", "0.05", "0.05R + 0.05"), 
+       col = c(redCol, blueCol, greenCol), 
+       lty = c(1, 3, 1), cex = 1.5)
+```
 
 ```{r}
 theme_set(theme_classic())
