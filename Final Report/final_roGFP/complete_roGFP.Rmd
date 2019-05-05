@@ -53,7 +53,7 @@ roGFP1_R12_spectra <- spectraMatrixFromValues(
     values_minimum = roGFP1_R12_data$V4,
     lambdas_maximum = roGFP1_R12_data$V1,
     values_maximum = roGFP1_R12_data$V2)
-roGFP1_R12_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP1_R9_spectra, 
+roGFP1_R12_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP1_R12_spectra, 
                                           lambda_1 = c(390, 410), lambda_2 = c(460, 480)),
                          e0 = -265)
 

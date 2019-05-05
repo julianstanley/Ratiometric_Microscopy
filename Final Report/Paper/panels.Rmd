@@ -1,5 +1,5 @@
 ---
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -43,17 +43,10 @@ print(paste("95% of values fall between", round(range[[1]], 3), "and",
 # E observed vs R at different error levels
 
 ```{r}
-db <- getDb()
-roGFP1_R12_data <- db$find('{"sensor_name" : "roGFP1_R12"}')
-roGFP1_R12_sensor <- new("redoxSensor",
-                           newSensorFromSpectra(
-                           spectraMatrixFromValues(roGFP1_R12_data$lambda_min[[1]],
-                                                   roGFP1_R12_data$values_min[[1]],
-                                                   roGFP1_R12_data$lambda_max[[1]],
-                                                   roGFP1_R12_data$values_max[[1]]),
-                           lambda_1 = c(395, 425), 
-                           lambda_2 = c(460, 480)),
-                           e0 = roGFP1_R12_data$sensor_midpoint[[1]])
+#db <- getDb()
+#roGFP1_R12_data <- db$find('{"sensor_name" : "roGFP1_R12"}')
+roGFP1_R12_sensor <- new("redoxSensor", Rmin = 0.667, 
+                         Rmax = 5.207, delta = 0.171, e0 = -265)
 
 error_model_generator <- function(abs_error) {
   return(function(x) {return(abs_error)})
@@ -62,7 +55,7 @@ error_model_generator <- function(abs_error) {
 plotdf <- data.frame()
 sensor <- roGFP1_R12_sensor
 errors <- c(0.01, 0.02, 0.027, 0.029, 0.03)
-errors <- c(0.027,0.029, 0.05, 0.1, 0.2)
+errors <- c(0.01, 0.025, 0.05, 0.1, 0.25, 0.5)
 for (error in errors) {
   R <- getR(sensor)
   error_table <- getErrorTable(sensor, R = R, FUN = getE,
@@ -98,13 +91,21 @@ ggplot() +
   geom_line(data=plotdf, aes(x = R, y = E_obs, col = error_model), na.rm = TRUE, size = 0.4) +
   ylab("Error in E") +
   ylim(c(-315,-175)) +
-  scale_color_manual(values=cbbPalette)
+  scale_color_manual(values=cbbPalette) +
+    geom_vline(aes(xintercept = 0.667)) +
+    geom_vline(aes(xintercept = 5.207)) +
+    geom_hline(aes(yintercept = -265)) +
+    geom_hline(aes(yintercept = -242.553))
 
-ggplot(plotdf, aes(x = R, y = error, col = error_model)) +
+    ggplot(plotdf, aes(x = R, y = error, col = error_model)) +
   geom_line(na.rm = TRUE, size = 1) +
   ylim(c(-2, 2)) +
   ylab("Error in E") +
-  scale_color_manual(values=cbbPalette)
+  scale_color_manual(values=cbbPalette) +
+    geom_vline(aes(xintercept = 0.667)) +
+    geom_vline(aes(xintercept = 5.207)) +
+    geom_hline(aes(yintercept = -265)) +
+    geom_hline(aes(yintercept = -242.553))
 
 ```
 
