@@ -2,12 +2,12 @@
 title: "Multiple Spectra Curves pHRed"
 output: 
   html_document:
-    code_folding: show
+    code_folding: hide
       
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 library(sensorOverlord)
 library(ggplot2)
 library(tidyverse)
