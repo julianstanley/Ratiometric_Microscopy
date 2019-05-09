@@ -1,6 +1,8 @@
 ---
 title: "Spectral Correction"
-output: html_document
+output: 
+    html_document:
+            code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
