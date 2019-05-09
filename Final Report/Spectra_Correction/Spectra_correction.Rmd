@@ -1,0 +1,170 @@
+---
+title: "Spectral Correction"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sensorOverlord)
+library(ggplot2)
+```
+
+Consider some spectra. Let's use roGFP1:
+
+```{r}
+roGFP1_data <- read.csv("../Raw_Spectra/rogfp1.csv", header = TRUE)
+roGFP1_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = roGFP1_data$Lambda_Reduced, 
+    values_minimum = roGFP1_data$Values_Reduced,
+    lambdas_maximum = roGFP1_data$Lambda_Oxidized,
+    values_maximum = roGFP1_data$Values_Oxidized)
+gfp1_spectraPlot <- plotSpectra(roGFP1_spectra, "Reduced", "Oxidized") + ggtitle("roGFP1")
+gfp1_spectraPlot +
+  theme(aspect.ratio=1)
+```
+
+Let's say when that sensor is oxidized, it is actually 95% oxidized.
+Similarly, when the sensor is reduced, it's actually only 90% reduced. 
+This is an extreme case for the sake of having nice(r) numbers
+
+We can describe the _95% oxidized_ curve's intensity  as a function of the **limiting** oxidized curve's intensity and and the **limiting** reduced curve's intensity.
+
+First, let's look at JUST the intensity at $400nm$. We'll then expand to any 
+wavelength.
+
+$$ I_{400} = I_X * P_{X} + I_R * P_{R} $$
+
+Where $I_{400}$ is the intensity at $400nm$, $I_X$ and $I_R$ are the intensity of the 
+limiting oxidized and reduced curves, respectively, and $P_X$ and $P_R$ are the 
+preportions of the oxidized and reduced curves that $I_{400}$ comes from.
+
+We have two unknowns in that equation: $I_X$ and $I_R$. To solve for two unknowns,
+we'll need two equations. That's why we'll need to use intensity values from
+two non-limiting curves--e.g. the 95% oxidized and 90% reduced curves in this example.
+
+Let's fill in some blanks. What's the intensity at $400nm$ of our two curves?
+
+```{r}
+# Oxidized curve intensity at 400
+roGFP1_spectra@values_maximum[abs(roGFP1_spectra@lambdas - 400) < 0.05]
+
+# Reduced curve intensity at 400
+roGFP1_spectra@values_minimum[abs(roGFP1_spectra@lambdas - 400) < 0.05]
+```
+
+So our intensities are $16.84$ for our 95% oxidized curve and $10.11$ for our
+90% reduced curve. We can now make a system of equations:
+
+$$ 16.84 = I_X * 0.95 + I_R * 0.05 $$ and
+$$ 10.11 = I_X * 0.10 + I_R * 0.90 $$
+
+We can describe this as an augmented matrix:
+
+$$
+  \left[\begin{array}{rr|r}
+    0.95 & 0.05 & 16.84  \\
+    0.10 & 0.90 & 10.11 
+  \end{array}\right]
+$$
+
+And R is nice enough to be able to solve matricies for us
+
+```{r}
+solve(matrix(c(0.95, 0.10, 0.05, 0.90), nrow = 2), c(16.84, 10.11))
+```
+
+So our values were $16.84$ and $10.11$ but they should have been $17.24$ and 
+$9.32$.
+
+Cool, so we can apply this general principle for all of the intensity values 
+in our spectra.
+
+First, we get the intensity values across all lambdas (I'll just show a few)
+
+```{r}
+# Oxidized curve intensity
+head(roGFP1_spectra@values_maximum)
+
+# Reduced curve intensity 0
+head(roGFP1_spectra@values_minimum)
+```
+
+We can generally say:
+
+$$ I_1 = I_X * 0.95 + I_R * 0.05 $$ and
+$$ I_2 = I_X * 0.10 + I_R * 0.90 $$
+
+For all intensity values $I$ from the 1st (95% oxidized) and 2nd (90% reduced)
+curves.
+
+That gives us a matrix for every intensity value, and we can solve all of those:
+
+```{r}
+new_maximum <- c()
+new_minimum <- c()
+
+interleaved_intensities <- c(rbind(roGFP1_spectra@values_maximum, roGFP1_spectra@values_minimum))
+
+for ( index in seq(1,length(interleaved_intensities),2) ) {
+    b <- interleaved_intensities[index:(index+1)]
+    a <- matrix(c(0.95, 0.10, 0.05, 0.90), nrow = 2)
+    answer <- solve(a, b)
+    
+    new_maximum <- c(new_maximum, answer[1])
+    new_minimum <- c(new_minimum, answer[2])
+    
+}
+
+head(new_maximum)
+head(new_minimum)
+```
+
+Plot of the adjusted spectra:
+
+```{r}
+roGFP1_adjSpectra <- new("sensorSpectra", lambdas = roGFP1_spectra@lambdas, 
+                         values_maximum = new_maximum,
+                         values_minimum = new_minimum)
+
+ggplot() +
+    geom_line(aes(x = roGFP1_spectra@lambdas, 
+                  y = roGFP1_spectra@values_minimum, color = "90% Reduced")) +
+    geom_line(aes(x = roGFP1_spectra@lambdas, 
+                  y = roGFP1_spectra@values_maximum, color = "95% Oxidized")) +
+    geom_line(aes(x = roGFP1_adjSpectra@lambdas, 
+                  y = roGFP1_adjSpectra@values_minimum, color = "100% Reduced")) +
+    geom_line(aes(x = roGFP1_adjSpectra@lambdas, 
+                  y = roGFP1_adjSpectra@values_maximum, color = "100% Oxidized")) +
+    scale_color_manual(name = "Sensor State",
+                       values = c("90% Reduced" ="#7291E8", 
+                                  "100% Reduced" ="#1F2840", 
+                                  "95% Oxidized" ="#FF0537", 
+                                  "100% Oxidized" ="#40010E")) +
+    xlab(expression(lambda (nm)))  +
+    ylab("Fluorescent emission (relative)") +
+    theme(aspect.ratio=1)
+```
+
+And I can make a function that generalizes this method:
+
+```{r}
+fix_spectra <- function(curve_1, pmax_1, curve_2, pmax_2) {
+    new_maximum <- c()
+    new_minimum <- c()
+
+interleaved_intensities <- c(rbind(curve1, curve2))
+
+for ( index in seq(1,length(interleaved_intensities),2) ) {
+    b <- interleaved_intensities[index:(index+1)]
+    a <- matrix(c(pmax_1, 1-pmax_1, pmax_2, 1-pmax_2), nrow = 2)
+    answer <- solve(a, b)
+    
+    new_maximum <- c(new_maximum, answer[1])
+    new_minimum <- c(new_minimum, answer[2])
+    
+}
+
+return(data.frame(new_maximum = new_maximum, new_minimum = new_minimum))
+       
+}
+```

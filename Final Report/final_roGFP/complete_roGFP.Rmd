@@ -1,7 +1,7 @@
     ---
 title: "Oh the roGFPs you will see"
 output:
-    pdf_document: default
+    html_document: default
 ---
 
 ## Document setup options
@@ -110,6 +110,10 @@ roGFP4_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP4_spectra,
                                          lambda_1 = c(380, 400), lambda_2 = c(460, 480)),
                      e0 = -286)
 
+roGFP4_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP4_spectra,
+                                         lambda_1 = c(505, 515), lambda_2 = c(465, 475)),
+                     e0 = -286)
+
 # roGFP5
 roGFP5_data <- read.csv(paste(sensor_repo, "rogfp5.csv", sep = ""), header = TRUE)
 roGFP5_spectra <- spectraMatrixFromValues(
@@ -191,14 +195,14 @@ knitr::kable(data.frame(charsMatrix), col.names = c("Sensor", "Rmin", "Rmax", "D
 ```{r}
 
 acceptable_error <- 2
-error_model <- function(x) {return(0.03*x)}
+error_model <- function(x) {return(0.03)}
 
 minMaxMatrix <- c()
 
 for (sensorName in sensorList) {
     sensor <- get(sensorName)
     sensorName <- str_replace(sensorName, "_sensor", "")
-    error_data2 <- getErrorTable(sensor, R = getR(sensor), 
+    error_data <- getErrorTable(sensor, R = getR(sensor), 
                                 FUN = getE, Error_Model = error_model)
     
     error_filter <- subset(error_data, 
@@ -276,44 +280,44 @@ plot(gg)
 ```
 
 ```{r Eobs_Eexp_plots, echo = FALSE, fig.width=10, fig.height=10}
-par(pty = 's', mfrow = c(2, 2))
-for (sensorName in sensorList) {
-    sensor <- get(sensorName)
-    sensorName <- str_replace(sensorName, "_sensor", "")
-    
-    sensor_errors <- getErrorTable(sensor, R = getR(sensor), 
-                                   Error_Model = function(x){return(x * 0.03)}, 
-                                   FUN = getE)
-    
-    sensor_errors$lower_error_neg <- (sensor_errors$lower_error * -1)
-    sensor_errors$lower_value <- (sensor_errors$FUN_true + sensor_errors$lower_error_neg)
-    sensor_errors$upper_value <- (sensor_errors$FUN_true + sensor_errors$upper_error)
-
-    plot(sensor_errors$lower_value ~ sensor_errors$FUN_true , type = 'l', 
-     ylim = c(-300, -200), xlim = c(-300, -200), lwd = 1, main = sensorName,
-     xlab = paste(expression(E[GSH]), "True (mV)"),
-     ylab = paste(expression(E[GSH]), "Observed (mV)"))
-    
-    points(sensor_errors$upper_value ~sensor_errors$FUN_true, type = "l", lwd = 1)
-    values_actual <- sensor_errors$FUN_true
-    values_top <- sensor_errors$upper_value
-    values_bottom <- sensor_errors$lower_value
-    trim <- round(length(values_actual)/8.5)
-    limits <- c(trim, length(values_actual) - trim)
-    print(sensorName)
-    polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y =   c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
-    legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
-        
-    assign(paste(sensorName, "_EEplot", sep = ""), recordPlot())
-    
-
-    plot(sensor_errors$FUN_true ~ sensor_errors$max_abs_error, type = 'l', xlim = c(0, 5), ylim = c(-350, -200), col = "black", lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = sensorName)
-    axis(side = 1, at = seq(0, 5, by = 0.1), 
-         labels = FALSE, tcl = -0.2) 
-    axis(side = 2, at = seq(-300, -200, by = 5), 
-         labels = FALSE, tcl = -0.2) 
-     assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
-}
+# par(pty = 's', mfrow = c(2, 2))
+# for (sensorName in sensorList) {
+#     sensor <- get(sensorName)
+#     sensorName <- str_replace(sensorName, "_sensor", "")
+#     
+#     sensor_errors <- getErrorTable(sensor, R = getR(sensor), 
+#                                    Error_Model = function(x){return(x * 0.03)}, 
+#                                    FUN = getE)
+#     
+#     sensor_errors$lower_error_neg <- (sensor_errors$lower_error * -1)
+#     sensor_errors$lower_value <- (sensor_errors$FUN_true + sensor_errors$lower_error_neg)
+#     sensor_errors$upper_value <- (sensor_errors$FUN_true + sensor_errors$upper_error)
+# 
+#     plot(sensor_errors$lower_value ~ sensor_errors$FUN_true , type = 'l', 
+#      ylim = c(-300, -200), xlim = c(-300, -200), lwd = 1, main = sensorName,
+#      xlab = paste(expression(E[GSH]), "True (mV)"),
+#      ylab = paste(expression(E[GSH]), "Observed (mV)"))
+#     
+#     points(sensor_errors$upper_value ~sensor_errors$FUN_true, type = "l", lwd = 1)
+#     values_actual <- sensor_errors$FUN_true
+#     values_top <- sensor_errors$upper_value
+#     values_bottom <- sensor_errors$lower_value
+#     trim <- round(length(values_actual)/8.5)
+#     limits <- c(trim, length(values_actual) - trim)
+#     print(sensorName)
+#     polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y =   c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+#     legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+#         
+#     assign(paste(sensorName, "_EEplot", sep = ""), recordPlot())
+#     
+# 
+#     plot(sensor_errors$FUN_true ~ sensor_errors$max_abs_error, type = 'l', xlim = c(0, 5), ylim = c(-350, -200), col = "black", lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = sensorName)
+#     axis(side = 1, at = seq(0, 5, by = 0.1), 
+#          labels = FALSE, tcl = -0.2) 
+#     axis(side = 2, at = seq(-300, -200, by = 5), 
+#          labels = FALSE, tcl = -0.2) 
+#      assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
+# }
 ```
 
 
