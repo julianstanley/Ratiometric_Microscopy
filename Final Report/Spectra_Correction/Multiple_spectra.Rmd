@@ -1,10 +1,13 @@
 ---
 title: "Multiple Spectra Curves pHRed"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
+      
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(sensorOverlord)
 library(ggplot2)
 library(tidyverse)
@@ -68,7 +71,7 @@ for (i in 1:8) {
 
 # Graph all the phred data
 ggplot(data = phred_data_tidy, aes(x = lambda, y = intensity, col = pH)) +
-    geom_line(stat = "smooth", method = "auto", ) +
+    geom_line(stat = "smooth", method = "auto") +
     xlab(expression(lambda (nm)))  +
     ylab("Fluorescent emission (relative)") +
     theme(aspect.ratio=1) +
@@ -169,17 +172,24 @@ plottable <- rbind(plottable,
 
 ```
 
+Here are the predicted limiting curves (for example, 5.5_9.0_min is the Rmin limiting
+curve predicted by the 5.5 and 9.0 non-limiting curves)
+
 ```{r}
 colors <- colors[c(1,8,2,7,3,6,4,5)]
 # Graph all the phred data
 ggplot(data = plottable, aes(x = lambda, y = intensity, col = pH)) +
-    geom_line() +
+    geom_line(stat = "smooth", method = "auto") +
     xlab(expression(lambda (nm)))  +
     ylab("Fluorescent emission (relative)") +
     theme(aspect.ratio=1) +
     scale_color_manual(values = colors)
 ```
 
+
+Here are those limiting curve predictions alongside the real curves.
+
+I did compute the 7.0_7.5 curve, but it was too extreme--it had emission up to 2.0.
 
 ```{r}
 colors <- c(rep("black", 8),colors)
@@ -195,7 +205,7 @@ plottable_combined$pH <- factor(plottable_combined$pH,
                                 levels = unique(plottable_combined$pH))
 
 ggplot(data = plottable_combined, aes(x = lambda, y = intensity, col = pH)) +
-    geom_line() +
+    geom_line(stat = "smooth", method = "auto") +
     xlab(expression(lambda (nm)))  +
     ylab("Fluorescent emission (relative)") +
     theme(aspect.ratio=1) +
@@ -203,28 +213,29 @@ ggplot(data = plottable_combined, aes(x = lambda, y = intensity, col = pH)) +
 ```
 
 
-Finding a pKa from the graph is going to be tricky. Think about it more.
+Finding a pKa from the graph is going to be tricky and I'll
+need to think about it more.
 
 ##
 ```{r}
-plot(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[1], 
-                                     phred_data$X6.0[1],
-                                     phred_data$X6.5[1], 
-                                     phred_data$X7.0[1], 
-                                     phred_data$X7.5[1], 
-                                     phred_data$X8.0[1], 
-                                     phred_data$X8.5[1],
-                                     phred_data$X9[1]), type = 'l', ylim = c(0,1))
-
-for (i in 2:50) {
-  points(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[i], 
-                                     phred_data$X6.0[i],
-                                     phred_data$X6.5[i], 
-                                     phred_data$X7.0[i], 
-                                     phred_data$X7.5[i], 
-                                     phred_data$X8.0[i], 
-                                     phred_data$X8.5[i],
-                                     phred_data$X9[i]), type = 'l')
-}
+# plot(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[1], 
+#                                      phred_data$X6.0[1],
+#                                      phred_data$X6.5[1], 
+#                                      phred_data$X7.0[1], 
+#                                      phred_data$X7.5[1], 
+#                                      phred_data$X8.0[1], 
+#                                      phred_data$X8.5[1],
+#                                      phred_data$X9[1]), type = 'l', ylim = c(0,1))
+# 
+# for (i in 2:50) {
+#   points(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[i], 
+#                                      phred_data$X6.0[i],
+#                                      phred_data$X6.5[i], 
+#                                      phred_data$X7.0[i], 
+#                                      phred_data$X7.5[i], 
+#                                      phred_data$X8.0[i], 
+#                                      phred_data$X8.5[i],
+#                                      phred_data$X9[i]), type = 'l')
+# }
 
 ```
