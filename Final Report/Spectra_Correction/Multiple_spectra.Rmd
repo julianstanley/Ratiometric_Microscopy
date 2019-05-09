@@ -1,0 +1,230 @@
+---
+title: "Multiple Spectra Curves pHRed"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sensorOverlord)
+library(ggplot2)
+library(tidyverse)
+source("diverging_map.R")
+```
+
+```{r}
+fix_spectra <- function(curve_1, pmax_1, curve_2, pmax_2) {
+    new_maximum <- c()
+    new_minimum <- c()
+
+interleaved_intensities <- c(rbind(curve_1, curve_2))
+
+for ( index in seq(1,length(interleaved_intensities),2) ) {
+    b <- interleaved_intensities[index:(index+1)]
+    a <- matrix(c(pmax_1, 1-pmax_1, pmax_2, 1-pmax_2), nrow = 2)
+    answer <- solve(a, b)
+    
+    new_maximum <- c(new_maximum, answer[1])
+    new_minimum <- c(new_minimum, answer[2])
+    
+}
+
+return(data.frame(new_maximum = new_maximum, new_minimum = new_minimum))
+       
+}
+```
+
+```{r}
+# Download the data
+phred_data <- read.csv("../../Additional_Sensors/Analysis/PHRed/Spectra_phred_multiple.csv", header = TRUE)
+
+# Gather the data into a tidy format
+phred_data_tidy <-
+gather(phred_data, pH, intensity, 
+       colnames(phred_data)[grepl("X", colnames(phred_data))]) 
+
+lambda <- gather(phred_data, value, lambda,
+      colnames(phred_data)[grepl("Lambda", colnames(phred_data))])
+
+phred_data_tidy$lambda <- lambda$lambda
+
+
+phred_data_tidy$pH <- modify(phred_data_tidy$pH, 
+     .f = function(x){str_replace(str_replace(x,"Lambda_", ""),"X","")})
+
+phred_data_tidy <- drop_na(phred_data_tidy)
+
+drops <- colnames(phred_data)[grepl("Lambda_", colnames(phred_data))]
+phred_data_tidy <- phred_data_tidy[ , !(names(phred_data_tidy) %in% drops)]
+```
+
+```{r}
+# Get colors
+map <- diverging.colormap(seq(0,1, by = 1/7), RGB(0.230, 0.299, 0.754), 
+                   RGB(0.58, 0.016, 0.150))
+colors <- c()
+for (i in 1:8) {
+  colors <- c(colors, rgb(map[i,1], map[i,2], map[i,3], maxColorValue = 1))
+}
+
+# Graph all the phred data
+ggplot(data = phred_data_tidy, aes(x = lambda, y = intensity, col = pH)) +
+    geom_line(stat = "smooth", method = "auto", ) +
+    xlab(expression(lambda (nm)))  +
+    ylab("Fluorescent emission (relative)") +
+    theme(aspect.ratio=1) +
+    scale_color_manual(values = colors)
+```
+
+Assume a pKa of 7.8. Now we can calculate limiting curves:
+
+For any curve, $Fraction_{Deprotenated} = \frac{10^{pH-pKa}}{1+10^{pH-pKa}}$
+
+```{r}
+frDeprot <- function(pH, pKa) {
+  return((10^(pH-pKa)) / (1 + 10^{pH - pKa}))
+}
+
+new_curves <- c()
+
+### 9 and 5.5
+spectra_5.5_9.0 <- spectraMatrixFromValues(
+  lambdas_minimum = phred_data$Lambda_9.0[!is.na(phred_data$Lambda_9.0)],
+  values_minimum = phred_data$X9,
+  lambdas_maximum = phred_data$Lambda_5.5[!is.na(phred_data$Lambda_5.5)],
+  values_maximum = phred_data$X5.5)
+                                            
+limit_5.5_9.0 <- fix_spectra(curve_1 = spectra_5.5_9.0@values_maximum,
+                                     pmax_1 = frDeprot(5.5, 7.8), 
+                                     spectra_5.5_9.0@values_minimum, 
+                                     pmax_2 = frDeprot(9.0, 7.8))
+
+plottable <- data.frame(pH = "5.5_9.0_min", 
+                        lambda = spectra_5.5_9.0@lambdas,
+                        intensity = limit_5.5_9.0$new_minimum)
+plottable <- rbind(plottable,
+                   data.frame(pH = "5.5_9.0_max", 
+                    lambda = spectra_5.5_9.0@lambdas,
+                    intensity = limit_5.5_9.0$new_maximum))
+### 6 and 8.5
+spectra_6.0_8.5 <- spectraMatrixFromValues(
+  lambdas_minimum = phred_data$Lambda_8.5[!is.na(phred_data$Lambda_8.5)],
+  values_minimum = phred_data$X8.5,
+  lambdas_maximum = phred_data$Lambda_6.0[!is.na(phred_data$Lambda_6.0)],
+  values_maximum = phred_data$X6.0)
+                                            
+limit_6.0_8.5 <- fix_spectra(curve_1 = spectra_6.0_8.5@values_maximum,
+                                     pmax_1 = frDeprot(6.0, 7.8), 
+                                     spectra_6.0_8.5@values_minimum, 
+                                     pmax_2 = frDeprot(8.5, 7.8))
+
+plottable <- rbind(plottable,
+                   data.frame(pH = "6.0_8.5_min", 
+                   lambda = spectra_6.0_8.5@lambdas,
+                   intensity = limit_6.0_8.5$new_minimum))
+plottable <- rbind(plottable,
+                   data.frame(pH = "6.0_8.5_max", 
+                    lambda = spectra_6.0_8.5@lambdas,
+                    intensity = limit_6.0_8.5$new_maximum))
+### 6.5 and 8
+spectra_6.5_8.0 <- spectraMatrixFromValues(
+  lambdas_minimum = phred_data$Lambda_8.0[!is.na(phred_data$Lambda_8.0)],
+  values_minimum = phred_data$X8.0,
+  lambdas_maximum = phred_data$Lambda_6.5[!is.na(phred_data$Lambda_6.5)],
+  values_maximum = phred_data$X6.5)
+                                            
+limit_6.5_8.0 <- fix_spectra(curve_1 = spectra_6.5_8.0@values_maximum,
+                                     pmax_1 = frDeprot(6.5, 7.8), 
+                                     spectra_6.5_8.0@values_minimum, 
+                                     pmax_2 = frDeprot(8.0, 7.8))
+
+plottable <- rbind(plottable,
+                   data.frame(pH = "6.5_8.0_min", 
+                   lambda = spectra_6.5_8.0@lambdas,
+                   intensity = limit_6.5_8.0$new_minimum))
+plottable <- rbind(plottable,
+                   data.frame(pH = "6.5_8.0_max", 
+                    lambda = spectra_6.5_8.0@lambdas,
+                    intensity = limit_6.5_8.0$new_maximum))
+
+### 7.0 and 7.5
+# spectra_7.0_7.5 <- spectraMatrixFromValues(
+#   lambdas_minimum = phred_data$Lambda_7.5[!is.na(phred_data$Lambda_7.5)],
+#   values_minimum = phred_data$X7.5,
+#   lambdas_maximum = phred_data$Lambda_7.0[!is.na(phred_data$Lambda_7.0)],
+#   values_maximum = phred_data$X7.0)
+#                                             
+# limit_7.0_7.5 <- fix_spectra(curve_1 = spectra_7.0_7.5@values_maximum,
+#                                      pmax_1 = frDeprot(7.0, 7.8), 
+#                                      spectra_7.0_7.5@values_minimum, 
+#                                      pmax_2 = frDeprot(7.5, 7.8))
+# 
+# plottable <- rbind(plottable,
+#                    data.frame(pH = "7.0_7.5_min", 
+#                    lambda = spectra_7.0_7.5@lambdas,
+#                    intensity = limit_7.0_7.5$new_minimum))
+# plottable <- rbind(plottable,
+#                    data.frame(pH = "7.0_7.5_max", 
+#                     lambda = spectra_7.0_7.5@lambdas,
+#                     intensity = limit_7.0_7.5$new_maximum))
+
+```
+
+```{r}
+colors <- colors[c(1,8,2,7,3,6,4,5)]
+# Graph all the phred data
+ggplot(data = plottable, aes(x = lambda, y = intensity, col = pH)) +
+    geom_line() +
+    xlab(expression(lambda (nm)))  +
+    ylab("Fluorescent emission (relative)") +
+    theme(aspect.ratio=1) +
+    scale_color_manual(values = colors)
+```
+
+
+```{r}
+colors <- c(rep("black", 8),colors)
+
+# Swap plottable rows
+plottable <- plottable[c("pH", "intensity", "lambda")]
+
+# combine phred and plottable
+plottable_combined <- rbind(phred_data_tidy, plottable)
+
+# Graph all the phred data
+plottable_combined$pH <- factor(plottable_combined$pH, 
+                                levels = unique(plottable_combined$pH))
+
+ggplot(data = plottable_combined, aes(x = lambda, y = intensity, col = pH)) +
+    geom_line() +
+    xlab(expression(lambda (nm)))  +
+    ylab("Fluorescent emission (relative)") +
+    theme(aspect.ratio=1) +
+    scale_color_manual(values = colors)
+```
+
+
+Finding a pKa from the graph is going to be tricky. Think about it more.
+
+##
+```{r}
+plot(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[1], 
+                                     phred_data$X6.0[1],
+                                     phred_data$X6.5[1], 
+                                     phred_data$X7.0[1], 
+                                     phred_data$X7.5[1], 
+                                     phred_data$X8.0[1], 
+                                     phred_data$X8.5[1],
+                                     phred_data$X9[1]), type = 'l', ylim = c(0,1))
+
+for (i in 2:50) {
+  points(x = seq(5.5,9, by = 0.5), y = c(phred_data$X5.5[i], 
+                                     phred_data$X6.0[i],
+                                     phred_data$X6.5[i], 
+                                     phred_data$X7.0[i], 
+                                     phred_data$X7.5[i], 
+                                     phred_data$X8.0[i], 
+                                     phred_data$X8.5[i],
+                                     phred_data$X9[i]), type = 'l')
+}
+
+```
