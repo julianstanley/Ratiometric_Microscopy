@@ -74,7 +74,7 @@ ggplot(data = phred_data_tidy, aes(x = lambda, y = intensity, col = pH)) +
     geom_line(stat = "smooth", method = "auto") +
     xlab(expression(lambda (nm)))  +
     ylab("Fluorescent emission (relative)") +
-    theme(aspect.ratio=1) +
+R    theme(aspect.ratio=1) +
     scale_color_manual(values = colors)
 ```
 

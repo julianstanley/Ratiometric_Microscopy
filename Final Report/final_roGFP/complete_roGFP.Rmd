@@ -1,7 +1,7 @@
-    ---
+---
 title: "Oh the roGFPs you will see"
 output:
-    html_document: default
+    pdf_document: default
 ---
 
 ## Document setup options
@@ -195,7 +195,7 @@ knitr::kable(data.frame(charsMatrix), col.names = c("Sensor", "Rmin", "Rmax", "D
 ```{r}
 
 acceptable_error <- 2
-error_model <- function(x) {return(0.03)}
+error_model <- function(x) {return(0.028*x)}
 
 minMaxMatrix <- c()
 
@@ -262,62 +262,66 @@ ranges$Sensor_Name <- factor(ranges$Sensor_Name,
 gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
                          y = Sensor_Name, group=Sensor_Name)) + 
         geom_dumbbell(color="#a3c4dc", 
-                      size=0.75) +
-           labs(x="E_GSH (mV)", 
+                      size=1.5) +
+           labs(x = expression("Redox Potential (" * E[GSH] * ", mV" * ")"),
              y=NULL, 
              title="", 
-             caption="Assumes an error model of R = R +/- 0.03R", 
+             caption="Assumes an error model of R = R +/- 0.028R", 
              subtitle="") +
     theme(plot.title = element_text(hjust=0.5, face="bold"),
-              plot.background=element_rect(fill="#f7f7f7"),
-              panel.background=element_rect(fill="#f7f7f7"),
+              #plot.background=element_rect(fill="#f7f7f7"),
+              #panel.background=element_rect(fill="#f7f7f7"),
               panel.grid.minor=element_blank(),
               panel.grid.major.y=element_blank(),
               legend.position="top",
               panel.border=element_blank(),
-          axis.text.x = element_text(angle = 90, hjust = 1))
+          text = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1)) 
 plot(gg)
 ```
 
+
+
+
 ```{r Eobs_Eexp_plots, echo = FALSE, fig.width=10, fig.height=10}
-# par(pty = 's', mfrow = c(2, 2))
-# for (sensorName in sensorList) {
-#     sensor <- get(sensorName)
-#     sensorName <- str_replace(sensorName, "_sensor", "")
-#     
-#     sensor_errors <- getErrorTable(sensor, R = getR(sensor), 
-#                                    Error_Model = function(x){return(x * 0.03)}, 
-#                                    FUN = getE)
-#     
-#     sensor_errors$lower_error_neg <- (sensor_errors$lower_error * -1)
-#     sensor_errors$lower_value <- (sensor_errors$FUN_true + sensor_errors$lower_error_neg)
-#     sensor_errors$upper_value <- (sensor_errors$FUN_true + sensor_errors$upper_error)
-# 
-#     plot(sensor_errors$lower_value ~ sensor_errors$FUN_true , type = 'l', 
-#      ylim = c(-300, -200), xlim = c(-300, -200), lwd = 1, main = sensorName,
-#      xlab = paste(expression(E[GSH]), "True (mV)"),
-#      ylab = paste(expression(E[GSH]), "Observed (mV)"))
-#     
-#     points(sensor_errors$upper_value ~sensor_errors$FUN_true, type = "l", lwd = 1)
-#     values_actual <- sensor_errors$FUN_true
-#     values_top <- sensor_errors$upper_value
-#     values_bottom <- sensor_errors$lower_value
-#     trim <- round(length(values_actual)/8.5)
-#     limits <- c(trim, length(values_actual) - trim)
-#     print(sensorName)
-#     polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y =   c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
-#     legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
-#         
-#     assign(paste(sensorName, "_EEplot", sep = ""), recordPlot())
-#     
-# 
-#     plot(sensor_errors$FUN_true ~ sensor_errors$max_abs_error, type = 'l', xlim = c(0, 5), ylim = c(-350, -200), col = "black", lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = sensorName)
-#     axis(side = 1, at = seq(0, 5, by = 0.1), 
-#          labels = FALSE, tcl = -0.2) 
-#     axis(side = 2, at = seq(-300, -200, by = 5), 
-#          labels = FALSE, tcl = -0.2) 
-#      assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
-# }
+par(pty = 's', mfrow = c(2, 2))
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+
+    sensor_errors <- getErrorTable(sensor, R = getR(sensor),
+                                   Error_Model = function(x){return(x * 0.03)},
+                                   FUN = getE)
+
+    sensor_errors$lower_error_neg <- (sensor_errors$lower_error * -1)
+    sensor_errors$lower_value <- (sensor_errors$FUN_true + sensor_errors$lower_error_neg)
+    sensor_errors$upper_value <- (sensor_errors$FUN_true + sensor_errors$upper_error)
+
+    plot(sensor_errors$lower_value ~ sensor_errors$FUN_true , type = 'l',
+     ylim = c(-300, -200), xlim = c(-300, -200), lwd = 1, main = sensorName,
+     xlab = paste(expression(E[GSH]), "True (mV)"),
+     ylab = paste(expression(E[GSH]), "Observed (mV)"))
+
+    points(sensor_errors$upper_value ~sensor_errors$FUN_true, type = "l", lwd = 1)
+    values_actual <- sensor_errors$FUN_true
+    values_top <- sensor_errors$upper_value
+    values_bottom <- sensor_errors$lower_value
+    trim <- round(length(values_actual)/8.5)
+    limits <- c(trim, length(values_actual) - trim)
+    print(sensorName)
+    # polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y =   c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+    legend("bottomright", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+
+    assign(paste(sensorName, "_EEplot", sep = ""), recordPlot())
+
+
+    plot(sensor_errors$FUN_true ~ sensor_errors$max_abs_error, type = 'l', xlim = c(0, 5), ylim = c(-350, -200), col = "black", lwd = 2, bty = 'l', xlab = "Expected accuracy (mV)", ylab = expression(E[GSH]), main = sensorName)
+    axis(side = 1, at = seq(0, 5, by = 0.1),
+         labels = FALSE, tcl = -0.2)
+    axis(side = 2, at = seq(-300, -200, by = 5),
+         labels = FALSE, tcl = -0.2)
+     assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
+}
 ```
 
 
@@ -348,17 +352,17 @@ r12_trunc <- data.frame(true = rep(r12_errors$FUN_true, 2),
 ```
 
 ```{r, fig.height = 5, fig.width = 5}
-par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
-values_actual <- r12_errors$FUN_true
-values_top <- r12_errors$upper_error
-values_bottom <- r12_errors$lower_error_neg
-
-plot(values_top ~ r12_errors$FUN_true , type = 'l', 
-     ylim = c(-20, 20), xlim = c(-300, -200), lwd = 1)
-points(values_bottom ~r12_errors$FUN_true, type = "l", lwd = 1)
-limits <- c(5, 435)
-polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
-legend("top", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
+# par(pty = 's', mfrow = c(1,1), mai = c(0.8, 0.8, 0.4, 0.8))
+# values_actual <- r12_errors$FUN_true
+# values_top <- r12_errors$upper_error
+# values_bottom <- r12_errors$lower_error_neg
+# 
+# plot(values_top ~ r12_errors$FUN_true , type = 'l', 
+#      ylim = c(-20, 20), xlim = c(-300, -200), lwd = 1)
+# points(values_bottom ~r12_errors$FUN_true, type = "l", lwd = 1)
+# limits <- c(5, 435)
+# polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_top[limits[1]:limits[2]], rev(values_bottom[limits[1]:limits[2]])), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+# legend("top", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
 ```
 
 ```{r, fig.height = 5, fig.width = 5}
@@ -372,7 +376,7 @@ plot(values_top ~ r12_errors$FUN_true , type = 'l',
      ylim = c(0, 10), xlim = c(-300, -200), lwd = 1)
 points(values_bottom ~r12_errors$FUN_true, type = "l", lwd = 1)
 limits <- c(5, 439)
-polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_max[limits[1]:limits[2]], rev(rep(0, length(limits[1]:limits[2])))), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
+# polygon(c(values_actual[limits[1]:limits[2]], rev(values_actual[limits[1]:limits[2]])), y = c(values_max[limits[1]:limits[2]], rev(rep(0, length(limits[1]:limits[2])))), col = rgb(1, 0, 0, alpha = 1), density = 50, lty = "dotted")
 legend("top", legend = c("R+3%", "R-3%", "Possible values"), col = c('black', 'black', rgb(1,0,0,alpha = 1)), lty = c(1, 1, 5))
 ```
 
@@ -533,4 +537,253 @@ axis(side = 2, at = seq(-300, -200, by = 5),
      labels = FALSE, tcl = -0.2) 
 
 legend("topleft", title = expression(R[max]/R[min]), xpd=TRUE, c("100", "10", "2"), pch = "-", lwd = 4, col = c(colors[1:3]), cex = 1)
+```
+
+
+```{r}
+
+# error_model <- function(x) {return(0.025*x)}
+# value <- -270
+# 
+# plot(R12_error$FUN_true ~ R12_error$max_abs_error,
+#      type = "l", ylim = c(value-1, value+1), xlim = c(0, 10))
+# 
+# for (sensorName in sensorList) {
+#     sensor <- get(sensorName)
+#     sensorName <- str_replace(sensorName, "_sensor", "")
+#     error_data <- getErrorTable(sensor, R = getR(sensor), 
+#                                 FUN = getE, Error_Model = error_model)
+#     
+#     points(error_data$FUN_true ~ error_data$max_abs_error, type = "l")
+#     
+#     print(sensorName)
+#     print(subset(error_data, abs(error_data$FUN_true - value) < 0.1)$max_abs_error[1])
+# }
+
+```
+
+
+
+# For figures
+
+```{r}
+# For figures!
+acceptable_error <- 1
+error_model <- function(x) {return(0.028*x)}
+
+minMaxMatrix <- c()
+
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+    error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+    
+    error_filter <- subset(error_data, 
+                           error_data$max_abs_error < acceptable_error)
+    
+    minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+    maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+    minMaxMatrix <- rbind(minMaxMatrix, c(sensorName, round(minimum, 0), round(maximum,0)))
+}
+
+ranges <- data.frame(minMaxMatrix)
+colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum")
+
+theme_set(theme_classic())
+
+ranges$Sensor_Name <- factor(ranges$Sensor_Name, 
+                            levels=as.character(ranges$Sensor_Name))
+
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=1.5) +
+           labs(x = expression("Redox Potential (" * E[GSH] * ", mV" * ")"),
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.028R", 
+             subtitle="") +
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              #plot.background=element_rect(fill="#f7f7f7"),
+              #panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank(),
+          text = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1)) 
+plot(gg)
+```
+
+```{r}
+acceptable_error <- 2
+error_model <- function(x) {return(0.028*x)}
+
+minMaxMatrix <- c()
+
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+    error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+    
+    error_filter <- subset(error_data, 
+                           error_data$max_abs_error < acceptable_error)
+    
+    minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+    maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+    minMaxMatrix <- rbind(minMaxMatrix, c(sensorName, round(minimum, 0), round(maximum,0)))
+}
+
+ranges <- data.frame(minMaxMatrix)
+colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum")
+
+theme_set(theme_classic())
+
+ranges$Sensor_Name <- factor(ranges$Sensor_Name, 
+                            levels=as.character(ranges$Sensor_Name))
+
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=1.5) +
+           labs(x = expression("Redox Potential (" * E[GSH] * ", mV" * ")"),
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.028R", 
+             subtitle="") +
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              #plot.background=element_rect(fill="#f7f7f7"),
+              #panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank(),
+          text = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1)) 
+plot(gg)
+```
+
+
+```{r}
+acceptable_error <- 3
+error_model <- function(x) {return(0.028*x)}
+
+minMaxMatrix <- c()
+
+for (sensorName in sensorList) {
+    sensor <- get(sensorName)
+    sensorName <- str_replace(sensorName, "_sensor", "")
+    error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                FUN = getE, Error_Model = error_model)
+    
+    error_filter <- subset(error_data, 
+                           error_data$max_abs_error < acceptable_error)
+    
+    minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+    maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+    minMaxMatrix <- rbind(minMaxMatrix, c(sensorName, round(minimum, 0), round(maximum,0)))
+}
+
+ranges <- data.frame(minMaxMatrix)
+colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum")
+
+theme_set(theme_classic())
+
+ranges$Sensor_Name <- factor(ranges$Sensor_Name, 
+                            levels=as.character(ranges$Sensor_Name))
+
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=1.5) +
+           labs(x = expression("Redox Potential (" * E[GSH] * ", mV" * ")"),
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.028R", 
+             subtitle="") +
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              #plot.background=element_rect(fill="#f7f7f7"),
+              #panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank(),
+          text = element_text(size = 20),
+          axis.text.x = element_text(angle = 90, hjust = 1)) 
+plot(gg)
+```
+
+
+```{R pointrange}
+generateMinMax <- function(error_model, error_cutoffs, sensor_list) {
+    minMaxMatrix <- data.frame(Sensor_Name = c(),
+                               Minimum = c(),
+                               Maximum = c(),
+                               error_thresh = c())
+    for(acceptable_error in error_cutoffs) {
+        for (sensor_name in sensor_list) {
+        sensor <- get(sensor_name)
+        sensor_name <- str_replace(sensor_name, "_sensor", "")
+        error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                    FUN = getE, Error_Model = error_model)
+        
+        error_filter <- subset(error_data, 
+                               error_data$max_abs_error < acceptable_error)
+        
+        minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+               yes = NaN, no = min(error_filter$FUN_true))
+        
+        maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+               yes = NaN, no = max(error_filter$FUN_true))
+        
+        minMaxMatrix <- rbind(minMaxMatrix, data.frame(Sensor_Name = sensor_name, 
+                                              Minimum = round(minimum, 0),
+                                              Maximum = round(maximum,0),
+                                              acceptable_error = 
+                                                  as.character(acceptable_error)))
+        }
+}
+
+ranges <- minMaxMatrix
+colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum", "error_thresh")
+
+return(ranges)
+}
+
+error_model <- function(x) {return(0.028*x)}
+
+ranges <- generateMinMax(error_model, c(1, 1.5, 2, 2.5, 3.0), sensorList)
+
+
+insert_minor <- function(major_labs, n_minor) {labs <- 
+                              c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
+                              labs[1:(length(labs)-n_minor)]}
+
+ggplot() +
+    geom_linerange(data = ranges %>% arrange(-as.numeric(error_thresh)), 
+                   mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
+                               lwd = 1, color = error_thresh)) +
+    scale_color_manual(values = rev(brewer.pal(5,"Greys"))) +
+    ylab("Redox Potential") +
+    xlab("") +
+    scale_y_continuous(breaks= seq(-400,-200,by = 10), 
+                     labels = insert_minor( seq(-400, -200, by = 50), 4 ), 
+                     limits = c(-350,-200), expand = c(0,0)) +
+    coord_flip()
+
+
 ```

@@ -1,0 +1,301 @@
+---
+title: "Ratio Flip"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+shh <- suppressPackageStartupMessages
+shh(require(sensorOverlord))
+shh(require(ggplot2))
+shh(require(ggalt))
+```
+
+First, load the roGFP1_R12 spectra data
+
+```{r}
+roGFP1_R12_data <- read.csv("../Raw_Spectra/rogfp1_R12.csv", 
+                            header = FALSE)
+
+roGFP1_R12_spectra <- spectraMatrixFromValues(
+    lambdas_minimum = roGFP1_R12_data$V3, 
+    values_minimum = roGFP1_R12_data$V4,
+    lambdas_maximum = roGFP1_R12_data$V1,
+    values_maximum = roGFP1_R12_data$V2)
+
+    plotSpectra(roGFP1_R12_spectra, "Reduced", "Oxidized") + ggtitle("roGFP1-R12") +
+      theme(aspect.ratio=1) 
+```
+
+Now, we create the roGFP1-R12 sensor with the ratio $\frac{(390,410)}{(460,480)}$
+
+```{r}
+roGFP1_R12_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP1_R12_spectra, 
+                                          lambda_1 = c(390, 410), lambda_2 = c(460, 480)),
+                         e0 = -265)
+```
+
+We can determine the suitable range for the normal roGFP1_R12 sensor:
+
+```{r}
+sensor <- roGFP1_R12_sensor
+
+error_model <- function(x){return(0.025*x)}
+
+acceptable_error <- 2
+
+R <- getR(sensor)
+R <- c(R, seq(4.98, 5.0, by = 0.000002))
+
+error_data <- suppressWarnings(
+  getErrorTable(sensor, R = R, 
+                                FUN = getE, Error_Model = error_model)
+)
+    
+error_filter <- subset(error_data, 
+                         error_data$max_abs_error < acceptable_error)
+    
+minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+ranges <- data.frame("Sensor_Name" = "roGFP1_R12_standard", 
+                     "Minimum" = round(minimum, 0), 
+                     "Maximum" = round(maximum,0))
+
+print(error_filter$FUN_true[error_filter$max_abs_error == 
+                                min(error_filter$max_abs_error)])
+```
+
+
+```{r}
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=0.75) +
+           labs(x="E_GSH (mV)", 
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.03R", 
+             subtitle="") +
+            scale_x_continuous(limits = c(-300,-200))+
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              plot.background=element_rect(fill="#f7f7f7"),
+              panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank(),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+           theme(aspect.ratio=1) 
+plot(gg)
+```
+
+Now we can repeat the process for the roGFP1-R12 sensor with the ratio $\frac{(460,480)}{(390,410)}$
+
+```{r}
+roGFP1_R12_sensor_flip <- new("redoxSensor", newSensorFromSpectra(roGFP1_R12_spectra, 
+                                          lambda_2 = c(390, 410), lambda_1 = c(460, 480)),
+                         e0 = -265)
+
+
+sensor <- roGFP1_R12_sensor_flip
+R <- getR(roGFP1_R12_sensor_flip)
+R <- c(R, seq(0.037, 0.038, by = 0.0000001))
+
+error_data <- suppressWarnings(
+  getErrorTable(sensor, R = getR(sensor, by = 0.0005, edgeBy = 1), 
+                                FUN = getE, Error_Model = error_model)
+)
+    
+error_filter <- subset(error_data, 
+                         error_data$max_abs_error < acceptable_error)
+    
+minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = min(error_filter$FUN_true))
+    
+maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+           yes = NaN, no = max(error_filter$FUN_true))
+    
+ranges <- rbind(ranges, data.frame("Sensor_Name" = "roGFP1_R12_flipped", 
+                     "Minimum" = round(minimum, 0), 
+                     "Maximum" = round(maximum,0)))
+
+print(error_filter$FUN_true[error_filter$max_abs_error == 
+                                min(error_filter$max_abs_error)])
+```
+
+```{r}
+gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
+                         y = Sensor_Name, group=Sensor_Name)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=0.75) +
+           labs(x="E_GSH (mV)", 
+             y=NULL, 
+             title="", 
+             caption="Assumes an error model of R = R +/- 0.03R", 
+             subtitle="") +
+            scale_x_continuous(limits = c(-300,-200))+
+    theme(plot.title = element_text(hjust=0.5, face="bold"),
+              plot.background=element_rect(fill="#f7f7f7"),
+              panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              legend.position="top",
+              panel.border=element_blank(),
+          axis.text.x = element_text(angle = 90, hjust = 1)) +
+   theme(aspect.ratio=1) 
+plot(gg)
+```
+
+```{r}
+R_norm <- getR(roGFP1_R12_sensor,  by = 0.001)
+R_inv <- getR(roGFP1_R12_sensor_flip, by = 0.0001)
+E_norm <- getE(roGFP1_R12_sensor, R_norm)
+E_inv <- getE(roGFP1_R12_sensor_flip, R_inv)
+OXD_norm <- getFractionMax(roGFP1_R12_sensor, R_norm)
+OXD_inv <- getFractionMax(roGFP1_R12_sensor_flip, R_inv)
+
+par(mfrow = c(1,2))
+plot(R_norm, E_norm, type = 'l')
+abline(h = median(E_norm[!is.na(E_norm)]), col = "blue")
+abline(h = median(E_inv[!is.na(E_inv)]), col = "red")
+plot(R_inv, E_inv, type = 'l')
+abline(h = median(E_norm[!is.na(E_norm)]), col = "blue")
+abline(h = median(E_inv[!is.na(E_inv)]), col = "red")
+
+plot(R_norm, OXD_norm, type = 'l')
+abline(h = median(OXD_norm[!is.na(OXD_norm)]), col = "blue")
+abline(h = median(OXD_inv[!is.na(OXD_inv)]), col = "red")
+plot(R_inv, OXD_inv, type = 'l')
+abline(h = median(OXD_norm[!is.na(OXD_norm)]), col = "blue")
+abline(h = median(OXD_inv[!is.na(OXD_inv)]), col = "red")
+
+
+
+print(roGFP1_R12_sensor@e0)
+print(log(roGFP1_R12_sensor@delta))
+print(roGFP1_R12_sensor_flip@e0)
+print(log(roGFP1_R12_sensor_flip@delta))
+
+print(median(E_norm[!is.na(E_norm)]))
+print(median(E_inv[!is.na(E_inv)]))
+print(mean(c(
+    median(E_norm[!is.na(E_norm)]),
+    median(E_inv[!is.na(E_inv)])
+)))
+
+
+
+print(mean(subset(E_norm, 
+                  R_norm - median(R_norm) == min(R_norm - median(R_norm)))))
+
+```
+
+```{r}
+# Exclude
+# 
+# error_model <- function(x){return(0.025)}
+# error_norm <- getErrorTable(roGFP1_R12_sensor, R = R_norm, 
+#                             Error_Model = error_model, 
+#                             FUN = getE)
+# error_inv <- getErrorTable(roGFP1_R12_sensor_flip, R = R_inv,
+#                            Error_Model = error_model,
+#                            FUN = getE)
+# 
+# plot(error_norm$max_abs_error ~ error_norm$FUN_true, 
+#      type = 'l', main = "410/470 \n Absolute Error",
+#      xlab = "E", ylab = "Error")
+# plot(error_inv$max_abs_error ~ error_inv$FUN_true,
+#      type = 'l', main = "470/410 \n Absolute Error",
+#      xlab = "E", ylab = "Error")
+# plot(error_norm$max_abs_error ~ error_norm$FUN_true, col = "black",
+#      main = "410/470 (black) with \n 470/410 (red) overlain \n Absolute Error",
+#      xlab = "E", ylab = "Error")
+# points(error_inv$max_abs_error ~ error_inv$FUN_true, col = "red")
+
+par(mfrow = c(3,2))
+
+# 1
+error_model <- function(x){return(0.025 * x)}
+error_norm <- getErrorTable(roGFP1_R12_sensor, R = R_norm, 
+                            Error_Model = error_model, 
+                            FUN = getE)
+error_inv <- getErrorTable(roGFP1_R12_sensor_flip, R = R_inv,
+                           Error_Model = error_model,
+                           FUN = getE)
+
+print(subset(error_norm$FUN_true, error_norm$max_abs_error == min(na.omit(error_norm)$max_abs_error)))
+
+plot(error_norm$upper_error ~ error_norm$FUN_true, 
+     type = 'l', main = "410/470 \n Relative Error \n (Upper error is black, lower purple)",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(abs(error_norm$lower_error) ~ error_norm$FUN_true, 
+     type = 'l', 
+     xlab = "E", ylab = "Error", col = "purple")
+
+
+
+plot(error_inv$upper_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error \n Upper black, lower purple",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(error_inv$lower_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error",
+     xlab = "E", ylab = "Error", col = "purple")
+
+# 2
+error_model <- function(x){return(0.050 * x)}
+error_norm <- getErrorTable(roGFP1_R12_sensor, R = R_norm, 
+                            Error_Model = error_model, 
+                            FUN = getE)
+error_inv <- getErrorTable(roGFP1_R12_sensor_flip, R = R_inv,
+                           Error_Model = error_model,
+                           FUN = getE)
+print(subset(error_norm$FUN_true, error_norm$max_abs_error == min(na.omit(error_norm)$max_abs_error)))
+
+plot(error_norm$upper_error ~ error_norm$FUN_true, 
+     type = 'l', main = "410/470 \n Relative Error \n (Upper error is black, lower purple)",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(abs(error_norm$lower_error) ~ error_norm$FUN_true, 
+     type = 'l', 
+     xlab = "E", ylab = "Error", col = "purple")
+
+
+
+plot(error_inv$upper_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error \n Upper black, lower purple",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(error_inv$lower_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error",
+     xlab = "E", ylab = "Error", col = "purple")
+
+# 3
+error_model <- function(x){return(0.1 * x)}
+error_norm <- getErrorTable(roGFP1_R12_sensor, R = R_norm, 
+                            Error_Model = error_model, 
+                            FUN = getE)
+error_inv <- getErrorTable(roGFP1_R12_sensor_flip, R = R_inv,
+                           Error_Model = error_model,
+                           FUN = getE)
+print(subset(error_norm$FUN_true, error_norm$max_abs_error == min(na.omit(error_norm)$max_abs_error)))
+
+plot(error_norm$upper_error ~ error_norm$FUN_true, 
+     type = 'l', main = "410/470 \n Relative Error \n (Upper error is black, lower purple)",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(abs(error_norm$lower_error) ~ error_norm$FUN_true, 
+     type = 'l', 
+     xlab = "E", ylab = "Error", col = "purple")
+
+
+
+plot(error_inv$upper_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error \n Upper black, lower purple",
+     xlab = "E", ylab = "Error", col = "black", ylim = c(0,80))
+points(error_inv$lower_error ~ error_inv$FUN_true,
+     type = 'l', main = "470/410 \n Relative Error",
+     xlab = "E", ylab = "Error", col = "purple")
+
+```
+

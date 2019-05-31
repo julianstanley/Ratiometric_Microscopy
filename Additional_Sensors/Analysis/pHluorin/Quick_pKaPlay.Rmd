@@ -1,0 +1,84 @@
+---
+title: "pKaPlay"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+
+Here's the spectra from pHluorin2:
+
+```{r}
+data <- read.csv("pHluorin2_all.csv", header = TRUE)
+
+# Manually stack the data
+lambdas_ind <- stack(
+  data[colnames(data)[grepl(pattern = "L", colnames(data))]])
+values <- stack(
+  data[colnames(data)[grepl(pattern = "V", colnames(data))]])$values
+lambdas <- lambdas_ind$values
+type <- lambdas_ind$ind
+
+spectra <- data.frame("lambda" = lambdas, "value" = values, "type" = type)
+
+# Plot
+ggplot(spectra, aes(x = lambda, y = value, color = type)) +
+  geom_line(stat = "smooth", method = "auto")
+
+# Plot
+ggplot(spectra, aes(x = lambda, y = value, color = type)) +
+  geom_point()
+```
+
+I want to get a pKa for this sensor. So I'll plot the fluoresence intensity
+as a function of pH. 
+
+I'll round lambdas to the nearest whole number (so like a 1)
+```{r}
+pH <- as.character(spectra$type)
+pH <- as.numeric(
+  gsub("L7.4", 7.4,
+     gsub("L7.0", 7,
+          gsub("L6.6", 6.6,
+               gsub("L6.2", 6.2,
+                    gsub("L5.8", 5.8,
+                         pH)))))
+)
+
+lambda <- round(spectra$lambda, 0)
+values <- spectra$value
+
+pKaCal <- data.frame("lambda" = as.character(lambda), "value" = values, "pH" = pH)
+
+ggplot(pKaCal %>% filter(lambda %in% c(390)), 
+       aes(x = pH, y = value, color = lambda)) +
+  geom_point() +
+  ylab("Intensity") +
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(pKaCal %>% filter(lambda %in% c(390, 475)), 
+       aes(x = pH, y = value, color = lambda)) +
+  geom_point() +
+  ylab("Intensity") +
+  scale_color_brewer(palette = "Dark2")
+
+ggplot(pKaCal %>% filter(lambda %in% c(380, 390, 400,
+                                       410, 420, 430,
+                                       440, 450, 460, 470)), 
+       aes(x = pH, y = value, color = lambda)) +
+  geom_point() +
+  ylab("Intensity") +
+  scale_color_brewer(palette = "Dark2")
+
+
+ggplot(pKaCal %>% filter(lambda %in% seq(350,450, by = 1)), 
+       aes(x = pH, y = value, color = lambda)) +
+  geom_line(stat = "smooth", method = "auto") +
+  ylab("Intensity") +
+  scale_color_brewer(palette = "Dark2") +
+  theme(legend.position = "none")
+
+```

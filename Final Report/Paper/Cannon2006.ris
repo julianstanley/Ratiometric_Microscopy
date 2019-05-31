@@ -1,0 +1,25 @@
+TY  - JOUR
+T1  - Re-engineering redox-sensitive green fluorescent protein for improved response rate
+A1  - Cannon, M. B.
+Y1  - 2005///
+KW  - active-site design
+KW  - biosensor
+KW  - disulfide conformation
+KW  - electrostatics calculation
+KW  - from aequorea victoria has
+KW  - maxima whose ratio
+KW  - midpoint potential
+KW  - rate enhancement
+KW  - redox
+KW  - rogfp
+KW  - the green fluorescent protein
+KW  - two widely separated excitation
+JF  - Protein Science
+VL  - 15
+IS  - 1
+SP  - 45
+EP  - 57
+DO  - 10.1110/ps.051734306
+L1  - file:///home/julian/Downloads/Cannon-2006-Re-engineering-redox-sensitive-gree.pdf
+N2  - Redox-sensitive variants of the green fluorescent protein (roGFPs) had previously been developed that allow "real-time" monitoring of the redox status of cellular compartments by fluorescence excitation ratiometry. However, the response time of these probes limits the study of certain rapid oxidative events, such as H2O2 bursts in cell signaling. The substitution of up to three positively charged amino acids adjacent to the introduced disulfide in roGFP1 (variants designated roGFP1-R1 through -R14) substantially improved the response rate. The pseudo first-order rate constants for oxidation by H2O2 and reduction by DTT and redox midpoint potentials were determined. The rate constants approximately doubled with each additional positively charged substitution, to nearly an order of magnitude total. The midpoint potentials are highly correlated with the rate increases, becoming more oxidizing with increasing numbers of positive substitutions. Crystal structures of two variants with opposite disulfide oxidation states have been determined: a 2.2 A resolution structure of oxidized "R7" containing two basic substitutions, and a 1.95 A resolution structure of reduced "R8" with one basic and one acidic substitution. Nonlinear Poisson-Boltzmann (PB) calculations are shown to accurately predict the effects of the substitutions on the rate constants. The effects of the substitutions on dimer formation, relative oxidative midpoint potentials, and oxidation and reduction rates are discussed. roGFPs are demonstrated to constitute an excellent model system for quantitative analysis of factors influencing thiol transfer reactions. roGFP1-R12 is most suitable for use in live cells, due to significantly increased reaction rate and increased pI.
+ER  - 

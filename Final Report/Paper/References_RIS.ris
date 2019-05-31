@@ -1,0 +1,468 @@
+TY  - JOUR
+T1  - Green fluorescent protein variants as ratiometric dual emission ph sensors. 1. Structural characterization and preliminary application
+A1  - Hanson, George T.
+A1  - McAnaney, Tim B.
+A1  - Park, Eun Sun
+A1  - Rendell, Marla E.P.
+A1  - Yarbrough, Daniel K.
+A1  - Chu, Shaoyou
+A1  - Xi, Lixuan
+A1  - Boxer, Steven G.
+A1  - Montrose, Marshall H.
+A1  - Remington, S. James
+Y1  - 2002/12//
+PB  - American Chemical Society
+JF  - Biochemistry
+VL  - 41
+IS  - 52
+SP  - 15477
+EP  - 15488
+DO  - 10.1021/bi026609p
+UR  - https://doi.org/10.1021/bi026609p
+L1  - file:///home/julian/Ratiometric_Microscopy/Additional_Sensors/Papers/pH/deGFP/Hanson2002.pdf
+N1  - doi: 10.1021/bi026609p
+N2  - Novel dual emission, pH-sensitive variants of the green fluorescent protein (GFP) have been constructed and are suitable for ratiometric emission measurements in vivo. This new class of GFPs, termed deGPFs, results from substitution of wild-type residue 65 with threonine and residues 148 and/or 203 with cysteine. deGFPs display pK(a) values ranging from 6.8 to 8.0 and emission that switches from a green form (lambda(max) approximately 515 nm) to a blue form (lambda(max) approximately 460 nm) with acidifying pH. In this report we analyze in most detail the deGFP1 variant (S65T/H148G/T203C, pK(a) approximately 8.0) and the deGFP4 variant (S65T/C48S/H148C/T203C, pK(a) approximately 7.3). In the following paper [McAnaney, T. B., Park, E. S., Hanson, G. T., Remington, S. J., and Boxer, S. G. (2002) Biochemistry 41, 15489-15494], data obtained by ultrafast fluorescence upconversion spectroscopy can be described by a kinetic model that includes an excited-state proton-transfer pathway at high pH but not at low pH. Crystal structure analyses of deGFP1 at high-pH and low-pH conformations were performed to elucidate the basis for the dual emission characteristics. At low pH the structure does not contain a hydrogen bond network that would support rapid transfer of a proton from the excited state of the neutral chromophore to a suitable acceptor; hence blue emission is observed. At high pH, backbone rearrangements induced by changes in the associated hydrogen bond network permit excited-state proton transfer from the excited state of the neutral chromophore to the bulk solvent via Ser147 and bound water molecules, resulting in green emission from the anionic chromophore. Comparative analysis suggests that the basis for dual emission is elimination of the wild-type proton-transfer network by the S65T substitution, a general reduction in hydrogen-bonding opportunities, and a concomitant increase in the hydrophobic nature of the chromophore environment resulting from the cysteine substitutions. We evaluated the suitability of the deGFP4 variant for intracellular pH measurements in mammalian cells by transient expression in PS120 fibroblasts. The responses of deGFP4 and a commercially available pH-sensitive dye, SNARF-1, to changes in pH were compared in the same cells. Results show that the dynamic range of the emission ratio change is comparable between the two pH sensors over the range examined. Two-photon excitation was found to elicit a better deGFP4 fluorescent signal above cellular autofluorescence when compared to conventional confocal microscopy. Given their favorable optical characteristics, suitable pK(a)'s for the physiological pH range, and suitability for ratiometric measurements, dual emission GFPs should make excellent probes for studying pH in vivo.
+ER  - 
+TY  - JOUR
+T1  - Diverse transcription factor binding features revealed by genome-wide ChIP-seq in C. elegans
+A1  - Niu, W
+A1  - Lu, Z J
+A1  - Zhong, M
+A1  - Sarov, M
+A1  - Murray, J I
+A1  - Brdlik, C M
+A1  - Janette, J
+A1  - Chen, C
+A1  - Alves, P
+A1  - Preston, E
+A1  - Slightham, C
+A1  - Jiang, L
+A1  - Hyman, A A
+A1  - Kim, S K
+A1  - Waterston, R H
+A1  - Gerstein, M
+A1  - Snyder, M
+A1  - Reinke, V
+Y1  - 2011///
+PB  - Cold Spring Harbor Laboratory
+JF  - Genome Research
+VL  - 21
+IS  - 2
+SP  - 245
+EP  - 254
+DO  - 10.1101/gr.114587.110
+UR  - http://10.0.4.77/gr.114587.110
+UR  - https://dx.doi.org/10.1101/gr.114587.110
+L1  - file:///home/julian/Downloads/kopernio/Niu-2011-Diverse-transcription-factor-bindin.pdf
+ER  - 
+TY  - JOUR
+T1  - Dynamic regulation of the mitochondrial proton gradient during cytosolic calcium elevations
+A1  - Poburko, Damon
+A1  - Santo-Domingo, Jaime
+A1  - Demaurex, Nicolas
+Y1  - 2011///
+JF  - Journal of Biological Chemistry
+VL  - 286
+IS  - 13
+SP  - 11672
+EP  - 11684
+SN  - 4122379539
+DO  - 10.1074/jbc.M110.159962
+L1  - file:///home/julian/Downloads/Poburko-2011-Dynamic-regulation-of-the-mitochond.pdf
+N2  - Mitochondria extrude protons across their inner membrane to generate the mitochondrial membrane potential (ΔΨ(m)) and pH gradient (ΔpH(m)) that both power ATP synthesis. Mitochondrial uptake and efflux of many ions and metabolites are driven exclusively by ΔpH(m), whose in situ regulation is poorly characterized. Here, we report the first dynamic measurements of ΔpH(m) in living cells, using a mitochondrially targeted, pH-sensitive YFP (SypHer) combined with a cytosolic pH indicator (5-(and 6)-carboxy-SNARF-1). The resting matrix pH (∼7.6) and ΔpH(m) (∼0.45) of HeLa cells at 37 °C were lower than previously reported. Unexpectedly, mitochondrial pH and ΔpH(m) decreased during cytosolic Ca(2+) elevations. The drop in matrix pH was due to cytosolic acid generated by plasma membrane Ca(2+)-ATPases and transmitted to mitochondria by P(i)/H(+) symport and K(+)/H(+) exchange, whereas the decrease in ΔpH(m) reflected the low H(+)-buffering power of mitochondria (∼5 mm, pH 7.8) compared with the cytosol (∼20 mm, pH 7.4). Upon agonist washout and restoration of cytosolic Ca(2+) and pH, mitochondria alkalinized and ΔpH(m) increased. In permeabilized cells, a decrease in bath pH from 7.4 to 7.2 rapidly decreased mitochondrial pH, whereas the addition of 10 μm Ca(2+) caused a delayed and smaller alkalinization. These findings indicate that the mitochondrial matrix pH and ΔpH(m) are regulated by opposing Ca(2+)-dependent processes of stimulated mitochondrial respiration and cytosolic acidification.
+ER  - 
+TY  - JOUR
+T1  - Live imaging of intra- and extracellular pH in plants using pHusion, a novel genetically encoded biosensor.
+A1  - Gjetting, Kisten Sisse Krag
+A1  - Ytting, Cecilie Karkov
+A1  - Schulz, Alexander
+A1  - Fuglsang, Anja Thoe
+Y1  - 2012///
+KW  - -atpase
+KW  - apoplast
+KW  - arabidopsis
+KW  - auxin
+KW  - cytoplasm
+KW  - gfp
+KW  - h
+KW  - ph homeostasis
+KW  - phusion
+KW  - sensor
+JF  - Journal of experimental botany
+VL  - 63
+IS  - 8
+SP  - 3207
+EP  - 18
+DO  - 10.1093/jxb/ers040
+UR  - http://www.ncbi.nlm.nih.gov/pubmed/22407646%0Ahttp://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=PMC3350929
+L1  - file:///home/julian/Downloads/Gjetting-2012-Live-imaging-of-intra--and-extracel.pdf
+N2  - Changes in pH are now widely accepted as a signalling mechanism in cells. In plants, proton pumps in the plasma membrane and tonoplast play a key role in regulation of intracellular pH homeostasis and maintenance of transmembrane proton gradients. Proton transport in response to external stimuli can be expected to be finely regulated spatially and temporally. With the ambition to follow such changes live, a new genetically encoded sensor, pHusion, has been developed. pHusion is especially designed for apoplastic pH measurements. It was constitutively expressed in Arabidopsis and targeted for expression in either the cytosol or the apoplast including intracellular compartments. pHusion consists of the tandem concatenation of enhanced green fluorescent protein (EGFP) and monomeric red fluorescent protein (mRFP1), and works as a ratiometric pH sensor. Live microscopy at high spatial and temporal resolution is highly dependent on appropriate immobilization of the specimen for microscopy. Medical adhesive often used in such experiments destroys cell viability in roots. Here a novel system for immobilizing Arabidopsis seedling roots for perfusion experiments is presented which does not impair cell viability. With appropriate immobilization, it was possible to follow changes of the apoplastic and cytosolic pH in mesophyll and root tissue. Rapid pH homeostasis upon external pH changes was reflected by negligible cytosolic pH fluctuations, while the apoplastic pH changed drastically. The great potential for analysing pH regulation in a whole-tissue, physiological context is demonstrated by the immediate alkalinization of the subepidermal apoplast upon external indole-3-acetic acid administration. This change is highly significant in the elongation zone compared with the root hair zone and control roots.
+ER  - 
+TY  - JOUR
+T1  - pHuji, a pH-sensitive red fluorescent protein for imaging of exo- and endocytosis
+A1  - Shen, Yi
+A1  - Rosendale, Morgane
+A1  - Campbell, Robert E.
+A1  - Perrais, David
+Y1  - 2014///
+JF  - Journal of Cell Biology
+VL  - 207
+IS  - 3
+SP  - 419
+EP  - 432
+DO  - 10.1083/jcb.201404107
+L1  - file:///home/julian/Downloads/Shen-2014-Phuji-a-ph-sensitive-red-fluorescen.pdf
+N2  -  Fluorescent proteins with pH-sensitive fluorescence are valuable tools for the imaging of exocytosis and endocytosis. The Aequorea green fluorescent protein mutant superecliptic pHluorin (SEP) is particularly well suited to these applications. Here we describe pHuji, a red fluorescent protein with a pH sensitivity that approaches that of SEP, making it amenable for detection of single exocytosis and endocytosis events. To demonstrate the utility of the pHuji plus SEP pair, we perform simultaneous two-color imaging of clathrin-mediated internalization of both the transferrin receptor and the β2 adrenergic receptor. These experiments reveal that the two receptors are differentially sorted at the time of endocytic vesicle formation. 
+ER  - 
+TY  - JOUR
+T1  - PHTomato, a red, genetically encoded indicator that enables multiplex interrogation of synaptic activity
+A1  - Li, Yulong
+A1  - Tsien, Richard W.
+Y1  - 2012///
+PB  - Nature Publishing Group
+JF  - Nature Neuroscience
+VL  - 15
+IS  - 7
+SP  - 1047
+EP  - 1053
+DO  - 10.1038/nn.3126
+UR  - http://dx.doi.org/10.1038/nn.3126
+L1  - file:///home/julian/Downloads/Li-2012-Phtomato-a-red-genetically-encoded-.pdf
+N2  - The usefulness of genetically encoded probes for optical monitoring of neuronal activity and brain circuits would be greatly advanced by the generation of multiple indicators with non-overlapping color spectra. Most existing indicators are derived from or spectrally convergent on GFP. We generated a bright, red, pH-sensitive fluorescent protein, pHTomato, that can be used in parallel with green probes to monitor neuronal activity. SypHTomato, made by fusing pHTomato to the vesicular membrane protein synaptophysin, reported activity-dependent exocytosis as efficiently as green reporters. When expressed with the GFP-based indicator GCaMP3 in the same neuron, sypHTomato enabled concomitant imaging of transmitter release and presynaptic Ca(2+) transients at single nerve terminals. Expressing sypHTomato and GCaMP3 in separate cells enabled the simultaneous determination of presynaptic vesicular turnover and postsynaptic sub- and supra-threshold responses from a connected pair of neurons. With these new tools, we observed a close size matching between pre- and postsynaptic compartments, as well as interesting target cell-dependent regulation of presynaptic vesicle pools. Lastly, by coupling expression of pHTomato- and GFP-based probes with distinct variants of channelrhodopsin, we provided proof-of-principle for an all-optical approach to multiplex control and tracking of distinct circuit pathways.
+ER  - 
+TY  - JOUR
+T1  - (SUPPLEMENT) A genetically encoded fluorescent reporter of ATP:ADP ratio
+A1  - Berg, Jim
+A1  - Hung, Yin Pun
+A1  - Yellen, Gary
+Y1  - 2009///
+JF  - Nature Methods
+VL  - 6
+IS  - 2
+SP  - 161
+EP  - 166
+DO  - 10.1038/nmeth.1288
+L1  - file:///home/julian/Downloads/Berg, Hung, Yellen - 2009 - A genetically encoded fluorescent reporter of ATPADP ratio.pdf
+N2  - We constructed a fluorescent sensor of adenylate nucleotides by combining a circularly permuted variant of GFP with a bacterial regulatory protein, GlnK1, from Methanococcus jannaschii. The sensor's affinity for Mg-ATP was <100 nM, as seen for other members of the bacterial PII regulator family, a surprisingly high affinity given that normal intracellular ATP concentration is in the millimolar range. ADP bound the same site of the sensor as Mg-ATP, competing with it, but produced a smaller change in fluorescence. At physiological ATP and ADP concentrations, the binding site is saturated, but competition between the two substrates causes the sensor to behave as a nearly ideal reporter of the ATP:ADP concentration ratio. This principle for sensing the ratio of two analytes by competition at a high-affinity site probably underlies the normal functioning of PII regulatory proteins. The engineered sensor, Perceval, can be used to monitor the ATP:ADP ratio during live-cell imaging.
+ER  - 
+TY  - JOUR
+T1  - A genetically encoded fluorescent reporter of ATP:ADP ratio
+A1  - Berg, Jim
+A1  - Hung, Yin Pun
+A1  - Yellen, Gary
+Y1  - 2009///
+JF  - Nature Methods
+VL  - 6
+IS  - 2
+SP  - 161
+EP  - 166
+DO  - 10.1038/nmeth.1288
+L1  - file:///home/julian/Downloads/Berg-2009-A-genetically-encoded-fluorescent-r.pdf
+N2  - We constructed a fluorescent sensor of adenylate nucleotides by combining a circularly permuted variant of GFP with a bacterial regulatory protein, GlnK1, from Methanococcus jannaschii. The sensor's affinity for Mg-ATP was <100 nM, as seen for other members of the bacterial PII regulator family, a surprisingly high affinity given that normal intracellular ATP concentration is in the millimolar range. ADP bound the same site of the sensor as Mg-ATP, competing with it, but produced a smaller change in fluorescence. At physiological ATP and ADP concentrations, the binding site is saturated, but competition between the two substrates causes the sensor to behave as a nearly ideal reporter of the ATP:ADP concentration ratio. This principle for sensing the ratio of two analytes by competition at a high-affinity site probably underlies the normal functioning of PII regulatory proteins. The engineered sensor, Perceval, can be used to monitor the ATP:ADP ratio during live-cell imaging.
+ER  - 
+TY  - JOUR
+T1  - Imaging intracellular pH in live cells with a genetically encoded red fluorescent protein sensor
+A1  - Tantama, Mathew
+A1  - Hung, Yin Pun
+A1  - Yellen, Gary
+Y1  - 2011///
+PB  - American Chemical Society (ACS)
+JF  - Journal of the American Chemical Society
+VL  - 133
+IS  - 26
+SP  - 10034
+EP  - 10037
+DO  - 10.1021/ja202902d
+UR  - http://10.0.3.253/ja202902d
+UR  - https://dx.doi.org/10.1021/ja202902d
+L1  - file:///home/julian/Downloads/kopernio/Tantama-2011-Imaging-intracellular-ph-in-live-ce.pdf
+N2  - Intracellular pH affects protein structure and function, and proton gradients underlie the function of organelles such as lysosomes and mitochondria. We engineered a genetically encoded pH sensor by mutagenesis of the red fluorescent protein mKeima, providing a new tool to image intracellular pH in live cells. This sensor, named pHRed, is the first ratiometric, single-protein red fluorescent sensor of pH. Fluorescence emission of pHRed peaks at 610 nm while exhibiting dual excitation peaks at 440 and 585 nm that can be used for ratiometric imaging. The intensity ratio responds with an apparent pK(a) of 6.6 and a >10-fold dynamic range. Furthermore, pHRed has a pH-responsive fluorescence lifetime that changes by ~0.4 ns over physiological pH values and can be monitored with single-wavelength two-photon excitation. After characterizing the sensor, we tested pHRed's ability to monitor intracellular pH by imaging energy-dependent changes in cytosolic and mitochondrial pH.
+ER  - 
+TY  - JOUR
+T1  - Imaging energy status in live cells with a fluorescent biosensor of the intracellular ATP-to-ADP ratio
+A1  - Tantama, Mathew
+A1  - Martínez-François, Juan Ramón
+A1  - Mongeon, Rebecca
+A1  - Yellen, Gary
+Y1  - 2013///
+JF  - Nature Communications
+VL  - 4
+IS  - May
+DO  - 10.1038/ncomms3550
+L1  - file:///home/julian/Downloads/ncomms3550.pdf
+N2  - The ATP:ADP ratio is a critical parameter of cellular energy status that regulates many metabolic activities. Here we report an optimized genetically encoded fluorescent biosensor, PercevalHR, that senses the ATP:ADP ratio. PercevalHR is tuned to the range of intracellular ATP:ADP expected in mammalian cells, and it can be used with one- or two-photon microscopy in live samples. We use PercevalHR to visualize activity-dependent changes in ATP:ADP when neurons are exposed to multiple stimuli, demonstrating that it is a sensitive reporter of physiological changes in energy consumption and production. We also use PercevalHR to visualize intracellular ATP:ADP while simultaneously recording currents from ATP-sensitive potassium (KATP) channels in single cells, showing that PercevalHR enables the study of coordinated variation in ATP:ADP and KATP channel open probability in intact cells. With its ability to monitor changes in cellular energetics within seconds, PercevalHR should be a versatile tool for metabolic research.
+ER  - 
+TY  - JOUR
+T1  - (SUPPLEMENT) Imaging energy status in live cells with a fluorescent biosensor of the intracellular ATP-to-ADP ratio Mathew Tantama , Juan Ramón Martínez-François , Rebecca Mongeon , Gary Yellen * Massachusetts , 02115 ; USA
+A1  - Tantama, Matthew
+L1  - file:///home/julian/Downloads/ncomms3550-s1.pdf
+ER  - 
+TY  - JOUR
+T1  - Simultaneous intracellular chloride and pH measurements using a GFP-based sensor
+A1  - Arosio, Daniele
+A1  - Ricci, Fernanda
+A1  - Marchetti, Laura
+A1  - Gualdani, Roberta
+A1  - Albertazzi, Lorenzo
+A1  - Beltram, Fabio
+Y1  - 2010///
+PB  - Nature Publishing Group
+JF  - Nature Methods
+VL  - 7
+IS  - 7
+SP  - 516
+EP  - 518
+DO  - 10.1038/nmeth.1471
+UR  - http://dx.doi.org/10.1038/nmeth.1471
+L1  - file:///home/julian/Ratiometric_Microscopy/Additional_Sensors/Papers/pH/ClopHensor/Arosio2010.pdf
+N2  - Chloride and protons perform important closely related roles in many cellular responses. Here we developed a ratiometric biosensor, ClopHensor, based on a highly chloride-sensitive Aequorea victoria GFP variant that is suited for the combined real-time optical detection of pH changes and chloride fluxes in live cells. We detected high chloride concentration in large dense-core exocytosis granules by targeting ClopHensor to these intracellular compartments. © 2010 Nature America, Inc. All rights reserved.
+ER  - 
+TY  - JOUR
+T1  - Development of a novel GFP-based ratiometric excitation and emission pH indicator for intracellular studies
+A1  - Bizzarri, Ranieri
+A1  - Arcangeli, Caterina
+A1  - Arosio, Daniele
+A1  - Ricci, Fernanda
+A1  - Faraci, Paolo
+A1  - Cardarelli, Francesco
+A1  - Beltram, Fabio
+Y1  - 2006///
+JF  - Biophysical Journal
+VL  - 90
+IS  - 9
+SP  - 3300
+EP  - 3314
+SN  - 3905050943
+DO  - 10.1529/biophysj.105.074708
+L1  - file:///home/julian/Ratiometric_Microscopy/Additional_Sensors/Papers/pH/E%5E2GFP/Bizzarri2006.pdf
+N2  - We report on the development of the F64L/S65T/T203Y/L231H GFP mutant (E2GFP) as an effective ratiometric pH indicator for intracellular studies. E2GFP shows two distinct spectral forms that are convertible upon pH changes both in excitation and in emission with pK close to 7.0. The excitation of the protein at 488 and 458 nm represents the best choice in terms of signal dynamic range and ratiometric deviation from the thermodynamic pK. This makes E2GFP ideally suited for imaging setups equipped with the most widespread light sources and filter settings. We used E2GFP to determine the average intracellular pH (pHi) and spatial pHi maps in two different cell lines, CHO and U-2 OS, under physiological conditions. In CHO, we monitored the evolution of the pHi during mitosis. We also showed the possibility to target specific subcellular compartments such as nucleoli (by fusing E2GFP with the transactivator protein of HIV, (Tat) and nuclear promyelocytic leukemia bodies (by coexpression of promyelocytic leukemia protein). © 2006 by the Biophysical Society.
+ER  - 
+TY  - JOUR
+T1  - Visualizing secretion and synaptic transmission with pH-sensitive green fluorescent proteins
+A1  - Miesenböck, Gero
+A1  - De Angelis, Dino A.
+A1  - Rothman, James E.
+Y1  - 1998///
+PB  - Springer Nature
+JF  - Nature
+VL  - 394
+IS  - 6689
+SP  - 192
+EP  - 195
+DO  - 10.1038/28190
+UR  - http://10.0.4.14/28190
+UR  - https://dx.doi.org/10.1038/28190
+L1  - file:///home/julian/Downloads/kopernio/Miesenbock-1998-Visualizing-secretion-and-synaptic-.pdf
+N2  - In neural systems, information is often carried by ensembles of cells rather than by individual units. Optical indicators provide a powerful means to reveal such distributed activity, particularly when protein-based and encodable in DNA: encodable probes can be introduced into cells, tissues, or transgenic organisms by genetic manipulation, selectively expressed in anatomically or functionally defined groups of cells, and, ideally, recorded in situ, without a requirement for exogenous cofactors. Here we describe sensors for secretion and neurotransmission that fulfil these criteria. We have developed pH-sensitive mutants of green fluorescent protein ('pHluorins') by structure-directed combinatorial mutagenesis, with the aim of exploiting the acidic pH inside secretory vesicles to monitor vesicle exocytosis and recycling. When linked to a vesicle membrane protein, pHluorins were sorted to secretory and synaptic vesicles and reported transmission at individual synaptic boutons, as well as secretion and fusion pore 'flicker' of single secretory granules.
+ER  - 
+TY  - JOUR
+T1  - pHluorin2: an enhanced, ratiometric, pH-sensitive green florescent protein
+A1  - Mahon, Matthew John
+Y1  - 2011///
+KW  - endocytosis
+KW  - gfp
+KW  - ph sensing
+KW  - phluorin
+JF  - Advances in Bioscience and Biotechnology
+VL  - 02
+IS  - 03
+SP  - 132
+EP  - 137
+DO  - 10.4236/abb.2011.23021
+UR  - http://www.scirp.org/journal/doi.aspx?DOI=10.4236/abb.2011.23021
+L1  - file:///home/julian/Downloads/Mahon-2011-Phluorin-an-enhanced-ratiometric-ph.pdf
+N2  - Green florescent protein (GFP) variants that are sensitive to changes in pH are invaluable reagents for the analysis of protein dynamics associated with both endo- and exocytotic vesicular trafficking. Ratiometric pHluorin is a GFP variant that displays a bimodal excitation spectrum with peaks at 395 and 475 nm and an emission maximum at 509 nm. Upon acidification, pHluorin excitation at 395 nm decreases with a corresponding increase in the excitation at 475 nm. GFP2, a GFP variant that contains mammalianized codons and the folding enhancing mutation F64L, displays ~8-fold higher florescence compared to pHluorin upon excitation at 395 nm. Using GFP2 as a template, an enhanced ratiometric pHluorin (pHluorin2) construct was developed to contain fully mammalianized codons, the F64L mutation and ten of the thirteen pHluorin-specific mutations. As a result, pHluorin2 displays markedly higher florescence when compared to pHluorin while maintaining the ratiometric pH-sensitivity. Unlike native pHluorin, pHluorin2 expressed in the ligand-binding domain of the parathyroid hormone 1 receptor is readily detectable by confocal microscopy and displays a marked increase in florescence upon ligand-induced endocytosis to intracellular vesicles. Thus, pHluorin2's enhanced florescence while sustaining ratiometric pH-sensitivity represents a significant improvement for this methodological approach.
+ER  - 
+TY  - JOUR
+T1  - Spectroscopic and structural study of proton and halide ion cooperative binding to GFP
+A1  - Arosio, Daniele
+A1  - Garau, Gianpiero
+A1  - Ricci, Fernanda
+A1  - Marchetti, Laura
+A1  - Bizzarri, Ranieri
+A1  - Nifosì, Riccardo
+A1  - Beltram, Fabio
+Y1  - 2007///
+JF  - Biophysical Journal
+VL  - 93
+IS  - 1
+SP  - 232
+EP  - 244
+DO  - 10.1529/biophysj.106.102319
+L1  - file:///home/julian/Ratiometric_Microscopy/Additional_Sensors/Papers/pH/E%5E1GFP/Arosio2007.pdf
+N2  - This study reports the influence of halogens on fluorescence properties of the Aequorea victoria Green Fluorescent Protein variant S65T/T203Y (E 2GFP). Halide binding forms a specific nonfluorescent complex generating a substantial drop of the fluorescence via static quenching. Spectroscopic analysis under different solution conditions reveals high halogen affinity, which is strongly dependent on the pH. This evidences the presence in E2GFP of interacting binding sites for halide ions and for protons. Thermodynamic link and cooperative interaction are assessed demonstrating that binding of one halide ion is associated with the binding of one proton in a cooperative fashion with the formation, in the pH range 4.5-10, of a single fully protonated E2GFP·halogen complex. To resolve the structural determinants of E2GFP sensitivity to halogens, high-resolution crystallographic structures were obtained for the halide-free and I-, Br-, and Cl- bound E2GFP. Remarkably the first high-resolution (1.4 Å) crystallographic structure of a chloride-bound GFP is reported. The chloride ion occupies a specific and unique binding pocket in direct contact (3.4 Å) with the chromophore imidazolidinone aromatic ring. Unanticipated flexibility, strongly modulated by halide ion interactions, is observed in the region surrounding the chromophore. Furthermore molecular dynamics simulations identified E222 residue (along with the chromophore Y66 residue) being in the protonated state when E 2GFP·halogen complex is formed. The impact of these results on high-sensitivity biosensor design will be discussed. © 2007 by the Biophysical Society.
+ER  - 
+TY  - JOUR
+T1  - A genetically encoded ratiometric sensor to measure extracellular pH in microdomains bounded by basolateral membranes of epithelial cells
+A1  - Urra, Javier
+A1  - Sandoval, Moisés
+A1  - Cornejo, Isabel
+A1  - Barros, L. Felipe
+A1  - Sepúlveda, Francisco V.
+A1  - Cid, L. Pablo
+Y1  - 2008///
+KW  - Basolateral microdomains
+KW  - ECFP
+KW  - EYFP
+KW  - Extracellular pH
+KW  - FRET
+KW  - MDCK cells
+KW  - Ratiometric imaging
+KW  - pH sensor
+JF  - Pflugers Archiv European Journal of Physiology
+VL  - 457
+IS  - 1
+SP  - 233
+EP  - 242
+DO  - 10.1007/s00424-008-0497-2
+L1  - file:///home/julian/Downloads/Urra-2008-A-genetically-encoded-ratiometric-s.pdf
+N2  - Extracellular pH, especially in relatively inaccessible microdomains between cells, affects transport membrane protein activity and might have an intercellular signaling role. We have developed a genetically encoded extracellular pH sensor capable of detecting pH changes in basolateral spaces of epithelial cells. It consists of a chimerical membrane protein displaying concatenated enhanced variants of cyan fluorescence protein (ECFP) and yellow fluorescence protein (EYFP) at the external aspect of the cell surface. The construct, termed pHCECSensor01, was targeted to basolateral membranes of Madin-Darby canine kidney (MDCK) cells by means of a sequence derived from the aquaporin AQP4. The fusion of pH-sensitive EYFP with pH-insensitive ECFP allows ratiometric pH measurements. The titration curve of pHCECSensor01 in vivo had a pK (a) value of 6.5 +/- 0.04. Only minor effects of extracellular chloride on pHCECSensor01 were observed around the physiological concentrations of this anion. In MDCK cells, the sensor was able to detect changes in pH secondary to H(+) efflux into the basolateral spaces elicited by an ammonium prepulse or lactate load. This genetically encoded sensor has the potential to serve as a noninvasive tool for monitoring changes in extracellular pH microdomains in epithelial and other tissues in vivo.
+ER  - 
+TY  - JOUR
+T1  - of Biology
+A1  - Houle, David
+A1  - Pélabon, Christophe
+A1  - Wagner, Günter P
+A1  - Hansen, Thomas F
+Y1  - 2011///
+KW  - dimensional analysis
+KW  - meaningfulness
+KW  - measurement theory
+KW  - modeling
+KW  - scale type
+KW  - scaling
+KW  - significance testing
+JF  - Quarterly Review of Biology
+VL  - 86
+IS  - 1
+SP  - 3
+EP  - 34
+L1  - file:///home/julian/Downloads/Houle2011.pdf
+N2  - A major goal of research in ecology and evolution is to explain why species richness varies across habitats, regions, and clades. Recent reviews have argued that species richness patterns among regions and clades may be explained by “ecological limits” on diversity over time, which are said to offer an alternative explanation to those invoking speciation and extinction (diversification) and time. Further, it has been proposed that this hypothesis is best supported by failure to find a positive relationship between time (e.g., clade age) and species richness. Here, I critically review the evidence for these claims, and propose how we might better study the ecological and evolutionary origins of species richness patterns. In fact, ecological limits can only influence species richness in clades by influencing speciation and extinction, and so this new “alternative paradigm” is simply one facet of the traditional idea that ecology influences diversification. The only direct evidence for strict ecological limits on richness (i.e., constant diversity over time) is from the fossil record, but many studies cited as supporting this pattern do not, and there is evidence for increasing richness over time. Negative evidence for a relationship between clade age and richness among extant clades is not positive evidence for constant diversity over time, and many recent analyses finding no age-diversity relationship were biased to reach this conclusion. More comprehensive analyses strongly support a positive age-richness relationship. There is abundant evidence that both time and ecological influences on diversification rates are important drivers of both large-scale and small-scale species richness patterns. The major challenge for future studies is to understand the ecological and evolutionary mechanisms underpinning the relationships between time, dispersal, diversification, and species richness patterns
+ER  - 
+TY  - JOUR
+T1  - Visualizing myosin-actin interaction with a genetically-encoded fluorescent strain sensor
+A1  - Iwai, S.
+A1  - Uyeda, T. Q. P.
+Y1  - 2008///
+PB  - Proceedings of the National Academy of Sciences
+JF  - Proceedings of the National Academy of Sciences
+VL  - 105
+IS  - 44
+SP  - 16882
+EP  - 16887
+DO  - 10.1073/pnas.0805513105
+UR  - http://10.0.4.49/pnas.0805513105
+UR  - https://dx.doi.org/10.1073/pnas.0805513105
+L1  - file:///home/julian/Downloads/kopernio/Iwai-2008-Visualizing-myosin-actin-interactio.pdf
+N2  - Many proteins have been shown to undergo conformational changes in response to externally applied force in vitro, but whether the force-induced protein conformational changes occur in vivo remains unclear. To reveal the force-induced conformational changes, or strains, within proteins in living cells, we have developed a genetically encoded fluorescent "strain sensor," by combining the proximity imaging (PRIM) technique, which uses spectral changes of 2 GFP molecules that are in direct contact, and myosin-actin as a model system. The developed PRIM-based strain sensor module (PriSSM) consists of the tandem fusion of a normal and circularly permuted GFP. To apply strain to PriSSM, it was inserted between 2 motor domains of Dictyostelium myosin II. In the absence of strain, the 2 GFP moieties in PriSSM are in contact, whereas when the motor domains are bound to F-actin, PriSSM has a strained conformation, leading to the loss of contact and a concomitant spectral change. Using the sensor system, we found that the position of the lever arm in the rigor state was affected by mutations within the motor domain. Moreover, the sensor was used to visualize the interaction between myosin II and F-actin in Dictyostelium cells. In normal cells, myosin was largely detached from F-actin, whereas ATP depletion or hyperosmotic stress increased the fraction of myosin bound to F-actin. The PRIM-based strain sensor may provide a general approach for studying force-induced protein conformational changes in cells.
+ER  - 
+TY  - JOUR
+T1  - Regulated spatial organization and sensitivity of cytosolic protein oxidation in Caenorhabditis elegans
+A1  - Romero-Aristizabal, Catalina
+A1  - Marks, Debora S.
+A1  - Fontana, Walter
+A1  - Apfeld, Javier
+Y1  - 2014///
+PB  - Springer Nature
+JF  - Nature Communications
+VL  - 5
+IS  - 1
+SP  - 5020
+EP  - 5020
+DO  - 10.1038/ncomms6020
+UR  - http://10.0.4.14/ncomms6020
+UR  - https://dx.doi.org/10.1038/ncomms6020
+L1  - file:///home/julian/Downloads/kopernio/Romero-aristizabal-2014-Regulated-spatial-organization-and- (1).pdf
+N2  - Cells adjust their behaviour in response to redox events by regulating protein activity through the reversible formation of disulfide bridges between cysteine thiols. However, the spatial and temporal control of these modifications remains poorly understood in multicellular organisms. Here we measured the protein thiol-disulfide balance in live Caenorhabditis elegans using a genetically encoded redox sensor and found that it is specific to tissues and is patterned spatially within a tissue. Insulin signalling regulates the sensor's oxidation at both of these levels. Unexpectedly, we found that isogenic individuals exhibit large differences in the sensor's thiol-disulfide balance. This variation contrasts with the general view that glutathione acts as the main cellular redox buffer. Indeed, our work suggests that glutathione converts small changes in its oxidation level into large changes in its redox potential. We therefore propose that glutathione facilitates the sensitive control of the thiol-disulfide balance of target proteins in response to cellular redox events.
+ER  - 
+TY  - JOUR
+T1  - FRET microscopy in the living cell: Different approaches, strengths and weaknesses
+A1  - Padilla-Parra, Sergi
+A1  - Tramier, Marc
+Y1  - 2012///
+PB  - Wiley
+JF  - BioEssays
+VL  - 34
+IS  - 5
+SP  - 369
+EP  - 376
+DO  - 10.1002/bies.201100086
+UR  - http://10.0.3.234/bies.201100086
+UR  - https://dx.doi.org/10.1002/bies.201100086
+L1  - file:///home/julian/Downloads/kopernio/Padilla-parra-2012-Fret-microscopy-in-the-living-cell- (1).pdf
+ER  - 
+TY  - JOUR
+T1  - Power analysis of single-cell rnA-sequencing experiments
+A1  - Svensson, Valentine
+A1  - Natarajan, Kedar Nath
+A1  - Ly, Lam Ha
+A1  - Miragaia, Ricardo J.
+A1  - Labalette, Charlotte
+A1  - Macaulay, Iain C.
+A1  - Cvejic, Ana
+A1  - Teichmann, Sarah A.
+Y1  - 2017///
+PB  - Springer Nature
+JF  - Nature Methods
+VL  - 14
+IS  - 4
+SP  - 381
+EP  - 387
+DO  - 10.1038/nmeth.4220
+UR  - http://10.0.4.14/nmeth.4220
+UR  - https://dx.doi.org/10.1038/nmeth.4220
+L1  - file:///home/julian/Downloads/kopernio/Svensson-2017-Power-analysis-of-single-cell-rna-s.pdf
+N2  - High-throughput single cell RNA sequencing (scRNA-seq) has become an established and powerful method to investigate transcriptomic cell-to-cell variation, and has revealed new cell types, and new insights into developmental process and stochasticity in gene expression. There are now several published scRNA-seq protocols, which all sequence transcriptomes from a minute amount of starting material. Therefore, a key question is how these methods compare in terms of sensitivity of detection of mRNA molecules, and accuracy of quantification of gene expression. Here, we assessed the sensitivity and accuracy of many published data sets based on standardized spike-ins with a uniform raw data processing pipeline. We developed a flexible and fast UMI counting tool (https://github.com/vals/umis) which is compatible with all UMI based protocols. This allowed us to relate these parameters to sequencing depth, and discuss the trade offs between the different methods. To confirm our results, we performed experiments on cells from the same population using three different protocols. We also investigated the effect of RNA degradation on spike-in molecules, and the average efficiency of scRNA-seq on spike-in molecules versus endogenous RNAs.
+ER  - 
+TY  - JOUR
+T1  - A fluorescent variant of a protein from the stony coral Montipora facilitates dual-color single-laser fluorescence cross-correlation spectroscopy
+A1  - Kogure, Takako
+A1  - Karasawa, Satoshi
+A1  - Araki, Toshio
+A1  - Saito, Kenta
+A1  - Kinjo, Masataka
+A1  - Miyawaki, Atsushi
+Y1  - 2006///
+PB  - Springer Nature
+JF  - Nature Biotechnology
+VL  - 24
+IS  - 5
+SP  - 577
+EP  - 581
+DO  - 10.1038/nbt1207
+UR  - http://10.0.4.14/nbt1207
+UR  - https://dx.doi.org/10.1038/nbt1207
+L1  - file:///home/julian/Downloads/kopernio/Kogure-2006-A-fluorescent-variant-of-a-protein-.pdf
+N2  - Dual-color fluorescence cross-correlation spectroscopy (FCCS) is a promising technique for quantifying protein-protein interactions. In this technique, two different fluorescent labels are excited and detected simultaneously within a common measurement volume. Difficulties in aligning two laser lines and emission crossover between the two fluorophores, however, make this technique complex. To overcome these limitations, we developed a fluorescent protein with a large Stokes shift. This protein, named Keima, absorbs and emits light maximally at 440 nm and 620 nm, respectively. Combining a monomeric version of Keima with cyan fluorescent protein allowed dual-color FCCS with a single 458-nm laser line and complete separation of the fluorescent protein emissions. This FCCS approach enabled sensitive detection of proteolysis by caspase-3 and the association of calmodulin with calmodulin-dependent enzymes. In addition, Keima and a spectral variant that emits maximally at 570 nm might facilitate simultaneous multicolor imaging with single-wavelength excitation.
+ER  - 
+TY  - JOUR
+T1  - Quantitative Imaging with Fluorescent Biosensors
+A1  - Okumoto, Sakiko
+A1  - Jones, Alexander
+A1  - Frommer, Wolf B.
+Y1  - 2012///
+PB  - Annual Reviews
+JF  - Annual Review of Plant Biology
+VL  - 63
+IS  - 1
+SP  - 663
+EP  - 706
+DO  - 10.1146/annurev-arplant-042110-103745
+UR  - http://10.0.4.122/annurev-arplant-042110-103745
+UR  - https://dx.doi.org/10.1146/annurev-arplant-042110-103745
+L1  - file:///home/julian/Downloads/kopernio/Okumoto-2012-Quantitative-imaging-with-fluoresce.pdf
+N2  - Molecular activities are highly dynamic and can occur locally in subcellular domains or compartments. Neighboring cells in the same tissue can exist in different states. Therefore, quantitative information on the cellular and subcellular dynamics of ions, signaling molecules, and metabolites is critical for functional understanding of organisms. Mass spectrometry is generally used for monitoring ions and metabolites; however, its temporal and spatial resolution are limited. Fluorescent proteins have revolutionized many areas of biology-e.g., fluorescent proteins can report on gene expression or protein localization in real time-yet promoter-based reporters are often slow to report physiologically relevant changes such as calcium oscillations. Therefore, novel tools are required that can be deployed in specific cells and targeted to subcellular compartments in order to quantify target molecule dynamics directly. We require tools that can measure enzyme activities, protein dynamics, and biophysical processes (e.g., membrane potential or molecular tension) with subcellular resolution. Today, we have an extensive suite of tools at our disposal to address these challenges, including translocation sensors, fluorescence-intensity sensors, and Förster resonance energy transfer sensors. This review summarizes sensor design principles, provides a database of sensors for more than 70 different analytes/processes, and gives examples of applications in quantitative live cell imaging.
+ER  - 
+TY  - JOUR
+T1  - PlotsOfDifferences - a web app for the quantitative comparison of unpaired data
+A1  - Goedhart, Joachim
+Y1  - 2019///
+JF  - bioRxiv
+SP  - 578575
+EP  - 578575
+DO  - 10.1101/578575
+UR  - http://biorxiv.org/content/early/2019/03/17/578575.abstract
+L1  - file:///home/julian/Downloads/kopernio/10.1101_578575.pdf
+N2  - The quantitative comparison of data acquired under different conditions is an important aspect of experimental science. The most widely used statistic for quantitative comparisons is the p-value. However, p-values suffer from several shortcomings. The most prominent shortcoming that is relevant for quantitative comparisons is that p-values fail to convey the magnitude of differences. The differences between conditions are best quantified by the determination of effect size. To democratize the calculation of effect size, we have developed a web-based tool. The tool uses bootstrapping to resample mean or median values for each of the conditions and these values are used to calculate the effect size and their compatibility interval. The web tool generates a graphical output, showing the bootstrap distribution of the difference next to the actual data for optimal interpretation. A tabular output with statistics and effect sizes is also generated and the table can be supplemented with p-values that are calculated with a randomization test. The app that we report here is dubbed PlotsOfDifferences and is available at: https://huygens.science.uva.nl/PlotsOfDifferences
+ER  - 
