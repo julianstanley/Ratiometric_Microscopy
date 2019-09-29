@@ -35,6 +35,8 @@ phred_spectra <- spectraMatrixFromValues(
     values_minimum = phRed_data$V4,
     lambdas_maximum = phRed_data$V1,
     values_maximum = phRed_data$V2)
+phred_spectra <- adjustSpectra(phred_spectra,
+                               0.93691, 0.995)
 phred_sensor <- new("pHSensor", newSensorFromSpectra(phred_spectra,
                                      lambda_1 = c(400, 420), lambda_2 = c(575, 585)), 
                     pKa = 7.8)
@@ -46,6 +48,8 @@ mkeima_spectra <- spectraMatrixFromValues(
     values_minimum = mkeima_data$V4,
     lambdas_maximum = mkeima_data$V1,
     values_maximum = mkeima_data$V2)
+mkeima_spectra <- adjustSpectra(mkeima_spectra,
+                                0.996, 0.9206)
 mkeima_sensor <- new("pHSensor", newSensorFromSpectra(mkeima_spectra,
                                      lambda_1 = c(400, 420), lambda_2 = c(575, 585)),
                  pKa = 6.6)
@@ -57,6 +61,8 @@ degfp1_spectra <- spectraMatrixFromValues(
     values_minimum = degfp1_data$V4,
     lambdas_maximum = degfp1_data$V1,
     values_maximum = degfp1_data$V2)
+degfp1_spectra <- adjustSpectra(degfp1_spectra,
+                                0.9, 0.989)
 degfp1_sensor <- new("pHSensor", newSensorFromSpectra(degfp1_spectra,
                                      lambda_1 = c(450, 470), lambda_2 = c(500, 520)),
                      pKa = 8.02)
@@ -68,6 +74,8 @@ degfp4_spectra <- spectraMatrixFromValues(
     values_minimum = degfp4_data$V4,
     lambdas_maximum = degfp4_data$V1,
     values_maximum = degfp4_data$V2)
+degfp4_spectra <- adjustSpectra(degfp4_spectra,
+                                0.979, 0.948)
 degfp4_sensor <- new("pHSensor", newSensorFromSpectra(degfp4_spectra,
                                      lambda_1 = c(450, 470), lambda_2 = c(500, 520)),
                      pKa = 7.34)
@@ -117,7 +125,7 @@ for (sensorName in sensorList) {
     
     maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
            yes = NaN, no = max(error_filter$FUN_true))
-    
+      
     minMaxMatrix <- rbind(minMaxMatrix, c(round(minimum, 2), round(maximum,2)))
 }
 ranges <- data.frame(minMaxMatrix)
@@ -192,4 +200,94 @@ for (sensorName in sensorList) {
          labels = FALSE, tcl = -0.2) 
      assign(paste(sensorName, "_phasePlot", sep = ""), recordPlot())
 }
+```
+
+
+```{r}
+# For presentation
+generateMinMax <- function(error_model, error_cutoffs, sensor_list) {
+    minMaxMatrix <- data.frame(Sensor_Name = c(),
+                               Minimum = c(),
+                               Maximum = c(),
+                               error_thresh = c())
+    for(acceptable_error in error_cutoffs) {
+        for (sensor_name in sensor_list) {
+        sensor <- get(sensor_name)
+        sensor_name <- str_replace(sensor_name, "_sensor", "")
+        error_data <- getErrorTable(sensor, R = getR(sensor), 
+                                    FUN = getpH, Error_Model = error_model)
+        
+        error_filter <- subset(error_data, 
+                               error_data$max_abs_error < acceptable_error)
+        
+        minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+               yes = NaN, no = min(error_filter$FUN_true))
+        
+        maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+               yes = NaN, no = max(error_filter$FUN_true))
+        
+        minMaxMatrix <- rbind(minMaxMatrix, data.frame(Sensor_Name = sensor_name, 
+                                              Minimum = round(minimum, 4),
+                                              Maximum = round(maximum,4),
+                                              acceptable_error = 
+                                                  as.numeric(acceptable_error)))
+        }
+}
+
+ranges <- minMaxMatrix
+colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum", "error_thresh")
+
+return(ranges)
+}
+
+error_model <- function(x) {return(0.028*x)}
+
+ranges <- generateMinMax(error_model, c(0.02, 0.04, 0.06, 0.08), sensorList)
+
+insert_minor <- function(major_labs, n_minor) {labs <- 
+                              c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
+                              labs[1:(length(labs)-n_minor)]}
+
+mc_tribble <- function(indf, indents = 4, mdformat = TRUE) {
+  name <- as.character(substitute(indf))
+  name <- name[length(name)]
+
+  meat <- capture.output(write.csv(indf, quote = TRUE, row.names = FALSE))
+  meat <- paste0(
+    paste(rep(" ", indents), collapse = ""),
+    c(paste(sprintf("~%s", names(indf)), collapse = ", "),
+      meat[-1]))
+
+  if (mdformat) meat <- paste0("    ", meat)
+  obj <- paste(name, " <- tribble(\n", paste(meat, collapse = ",\n"), ")", sep = "")
+  if (mdformat) cat(paste0("    ", obj)) else cat(obj)
+}
+
+eval(mc_tribble(ranges))
+
+ggplot() +
+  geom_linerange(data = ranges %>% arrange(-error_thresh), 
+                 mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
+                             lwd = 1, color = error_thresh), size = 10) +
+  scale_color_continuous(high = "lightgreen", low = "forestgreen") +
+  xlab("")+
+  ylab("Glutathione Redox Potential (mV)") +
+  coord_flip()  +
+  theme_classic() +
+  theme(aspect.ratio = 1)
+
+
+ggplot() +
+    geom_linerange(data = ranges %>% arrange(-as.numeric(error_thresh)), 
+                   mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
+                               lwd = 1, color = error_thresh)) +
+    scale_color_manual(values = rev(brewer.pal(5,"Greens"))) +
+    ylab("Redox Potential") +
+    xlab("") +
+    scale_y_continuous(breaks= seq(-400,-200,by = 10), 
+                     labels = insert_minor( seq(-400, -200, by = 50), 4 ), 
+                     limits = c(-350,-200), expand = c(0,0)) +
+    coord_flip() + theme_pub
+  
+
 ```

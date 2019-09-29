@@ -1,5 +1,5 @@
 ---
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -57,7 +57,7 @@ error_model_generator <- function(error) {
 plotdf <- data.frame()
 sensor <- roGFP1_R12_sensor
 errors <- c(0.01, 0.02, 0.027, 0.029, 0.03)
-errors <- c(0.01, 0.025, 0.05, 0.1, 0.25, 0.5)
+errors <- c(0.025, 0.1, 0.25, 0.5)
 for (error in errors) {
   R <- getR(sensor)
   error_table <- getErrorTable(sensor, R = R, FUN = getE,
@@ -97,7 +97,16 @@ ggplot() +
     geom_vline(aes(xintercept = 0.667)) +
     geom_vline(aes(xintercept = 5.207)) +
     geom_hline(aes(yintercept = -265)) +
-    geom_hline(aes(yintercept = -242.553))
+    geom_hline(aes(yintercept = -242.553)) +
+    geom_text(aes(x = 0.667, y = -315,
+		                  label = "Rmin"), hjust = -0.1) +
+    geom_text(aes(x = 5.207, y = -315,
+		                  label = "Rmax"), hjust = 1.1) +
+    geom_text(aes(x = 0.667, y = -245,
+		                  label = "E0_Adj"), hjust = -0.1) +
+    geom_text(aes(x = 0.667, y = -263,
+		                  label = "E0"), hjust = -0.1) 
+
 
     ggplot(plotdf, aes(x = R, y = error, col = error_model)) +
   geom_line(na.rm = TRUE, size = 1) +
@@ -111,6 +120,50 @@ ggplot() +
 
 ## For presentation
     head(subset(plotdf, plotdf$error_model == "0.025_upper"))
+    
+    
+# For presentation
+    
+plotdf <- data.frame()
+sensor <- roGFP1_R12_sensor
+errors <- c(0.028)
+for (error in errors) {
+  R <- getR(sensor)
+  error_table <- getErrorTable(sensor, R = R, FUN = getE,
+                               Error_Model = error_model_generator(error))
+  
+  error_upper_rep <- rep(paste(error, 'upper', sep = "_"), length(R))
+  error_lower_rep <- rep(paste(error, 'lower', sep = "_"), length(R))
+  
+  E_obs <- c(error_table$FUN_true + error_table$upper_error, 
+             error_table$FUN_true - error_table$lower_error)
+  
+  E_obs <- sapply(E_obs, function(x) replace(x, is.infinite(x),NA))
+  
+  new_df <- data.frame(R = rep(R, 2), error = c(error_table$upper_error,
+                                                 -1*error_table$lower_error),
+                       error_model = c(error_upper_rep, error_lower_rep),
+                       E_obs = E_obs,
+                       max_abs_error = error_table$max_abs_error)
+  
+  plotdf <- rbind(plotdf, new_df)
+}
+
+cbbPalette <- c("#D55E00", "#D55E00",
+                "#E69F00", "#E69F00", 
+                "#56B4E9", "#56B4E9", 
+                "#009E73", "#009E73",
+                "#D55E00", "#D55E00",
+                "#000000", "#000000")
+
+E_base <- getE(sensor)
+R_base <- getR(sensor)
+
+ggplot(error_table, aes(x = FUN_true, y = max_abs_error)) +
+    geom_line() +
+    coord_cartesian(ylim = c(0, 5), xlim = c(-320, -205)) +
+    theme(aspect.ratio=1)
+
 ```
 
 # Phase plot (for absolute error of 0.03)
@@ -207,5 +260,39 @@ ggplot(error_df, aes(y = error, x = E)) +
   ylim(c(0,5)) +
   xlim(c(-300, -200)) +
   coord_flip()
+```
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+
+R_E <- function(R) {
+	-265 - (8.315*295.15)/(2*96.48104) *
+		log(
+		    (1 *
+		     (5.1 - R) /
+		    (R - 0.9)))
+}
+
+R_Error <- function(R, Error = 0.10) {
+	(-265 - (8.315*295.15)/(2*96.48104) *
+	log(
+	    (1 *
+	     (5.1 - (R * (1 + Error))) /
+	    ((R * (1 + Error)) - 0.9))) )
+
+}
+
+plot <- ggplot(data = data.frame(x = 0), mapping = aes(x = x))
+
+plot + 
+    stat_function(fun = R_E, geom = "line", col = "black") +
+    stat_function(fun = R_Error, geom = "line", col = "red") + 
+    xlim(1, 5) + 
+    ylab("E") + xlab("R") + theme_pubr()
+
+
+
+
 ```
 

@@ -15,6 +15,8 @@ shh(require(ggplot2))
 shh(require(cowplot))
 shh(require(stringr))
 shh(require(ggalt))
+shh(require(tidyverse))
+library(RColorBrewer)
 ```
 
 ## Initalize Sensors 
@@ -127,7 +129,7 @@ roGFP5_sensor <- new("redoxSensor", newSensorFromSpectra(roGFP5_spectra,
 # roGFP6
 roGFP6_data <- read.csv(paste(sensor_repo, "rogfp6.csv", sep = ""), header = TRUE)
 roGFP6_spectra <- spectraMatrixFromValues(
-    lambdas_minimum = roGFP6_data$Lambda_310 , 
+    lambdas_minimum = roGFP6_data$Lambda_310 ,  
     values_minimum = roGFP6_data$X.310.mv,
     lambdas_maximum = roGFP6_data$Lambda_230,
     values_maximum = roGFP6_data$X.230.mv)
@@ -727,63 +729,251 @@ gg <- ggplot(ranges, aes(x=Minimum, xend=Maximum,
 plot(gg)
 ```
 
-
-```{R pointrange}
-generateMinMax <- function(error_model, error_cutoffs, sensor_list) {
-    minMaxMatrix <- data.frame(Sensor_Name = c(),
-                               Minimum = c(),
-                               Maximum = c(),
-                               error_thresh = c())
-    for(acceptable_error in error_cutoffs) {
-        for (sensor_name in sensor_list) {
-        sensor <- get(sensor_name)
-        sensor_name <- str_replace(sensor_name, "_sensor", "")
-        error_data <- getErrorTable(sensor, R = getR(sensor), 
-                                    FUN = getE, Error_Model = error_model)
-        
-        error_filter <- subset(error_data, 
-                               error_data$max_abs_error < acceptable_error)
-        
-        minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
-               yes = NaN, no = min(error_filter$FUN_true))
-        
-        maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
-               yes = NaN, no = max(error_filter$FUN_true))
-        
-        minMaxMatrix <- rbind(minMaxMatrix, data.frame(Sensor_Name = sensor_name, 
-                                              Minimum = round(minimum, 0),
-                                              Maximum = round(maximum,0),
-                                              acceptable_error = 
-                                                  as.character(acceptable_error)))
-        }
+```{r}
+theme_pub <- function(base_size=14, base_family="helvetica") {
+      library(grid)
+      library(ggthemes)
+      (theme_foundation(base_size=base_size, base_family=base_family)
+       + theme(plot.title = element_text(face = "bold",
+                                         size = rel(1.2), hjust = 0.5),
+               text = element_text(),
+               panel.background = element_rect(colour = NA),
+               plot.background = element_rect(colour = NA),
+               panel.border = element_rect(colour = NA),
+               axis.title = element_text(face = "bold",size = rel(1)),
+               axis.title.y = element_text(angle=90,vjust =2),
+               axis.title.x = element_text(vjust = -0.2),
+               axis.text = element_text(), 
+               axis.line = element_line(colour="black"),
+               axis.ticks = element_line(),
+               panel.grid.major = element_line(colour="#f0f0f0"),
+               panel.grid.minor = element_blank(),
+               legend.key = element_rect(colour = NA),
+               legend.position = "bottom",
+               legend.direction = "horizontal",
+               legend.key.size= unit(0.2, "cm"),
+               legend.margin = unit(0, "cm"),
+               legend.title = element_text(face="italic"),
+               plot.margin=unit(c(10,5,5,5),"mm"),
+               strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"),
+               strip.text = element_text(face="bold")
+          ))
+      
 }
 
-ranges <- minMaxMatrix
-colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum", "error_thresh")
+scale_fill_Publication <- function(...){
+      library(scales)
+      discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 
-return(ranges)
 }
 
-error_model <- function(x) {return(0.028*x)}
+scale_colour_Publication <- function(...){
+      library(scales)
+      discrete_scale("colour","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
 
-ranges <- generateMinMax(error_model, c(1, 1.5, 2, 2.5, 3.0), sensorList)
+}
+```
 
+```{r pointrange}
+# generateMinMax <- function(error_model, error_cutoffs, sensor_list) {
+#     minMaxMatrix <- data.frame(Sensor_Name = c(),
+#                                Minimum = c(),
+#                                Maximum = c(),
+#                                error_thresh = c())
+#     for(acceptable_error in error_cutoffs) {
+#         for (sensor_name in sensor_list) {
+#         sensor <- get(sensor_name)
+#         sensor_name <- str_replace(sensor_name, "_sensor", "")
+#         error_data <- getErrorTable(sensor, R = getR(sensor), 
+#                                     FUN = getE, Error_Model = error_model)
+#         
+#         error_filter <- subset(error_data, 
+#                                error_data$max_abs_error < acceptable_error)
+#         
+#         minimum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+#                yes = NaN, no = min(error_filter$FUN_true))
+#         
+#         maximum <- ifelse(test = length(error_filter$FUN_true) == 0, 
+#                yes = NaN, no = max(error_filter$FUN_true))
+#         
+#         minMaxMatrix <- rbind(minMaxMatrix, data.frame(Sensor_Name = sensor_name, 
+#                                               Minimum = round(minimum, 0),
+#                                               Maximum = round(maximum,0),
+#                                               acceptable_error = 
+#                                                   as.numeric(acceptable_error)))
+#         }
+# }
+# 
+# ranges <- minMaxMatrix
+# colnames(ranges) <- c("Sensor_Name", "Minimum", "Maximum", "error_thresh")
+# 
+# return(ranges)
+# }
+# 
+# error_model <- function(x) {return(0.028*x)}
+# 
+# ranges <- generateMinMax(error_model, c(1, 1.5, 2, 2.5, 3.0), sensorList)
+# 
+# insert_minor <- function(major_labs, n_minor) {labs <- 
+#                               c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
+#                               labs[1:(length(labs)-n_minor)]}
+# 
+# mc_tribble <- function(indf, indents = 4, mdformat = TRUE) {
+#   name <- as.character(substitute(indf))
+#   name <- name[length(name)]
+# 
+#   meat <- capture.output(write.csv(indf, quote = TRUE, row.names = FALSE))
+#   meat <- paste0(
+#     paste(rep(" ", indents), collapse = ""),
+#     c(paste(sprintf("~%s", names(indf)), collapse = ", "),
+#       meat[-1]))
+# 
+#   if (mdformat) meat <- paste0("    ", meat)
+#   obj <- paste(name, " <- tribble(\n", paste(meat, collapse = ",\n"), ")", sep = "")
+#   if (mdformat) cat(paste0("    ", obj)) else cat(obj)
+# }
+# 
+# mc_tribble(ranges)
+# ranges <- tribble(
+#         ~Sensor_Name, ~Minimum, ~Maximum, ~error_thresh,
+#         "roGFP1",-286,-259,1,
+#         "roGFP2",-298,-251,1,
+#         "roGFP3",NA,NA,1,
+#         "roGFP4",NA,NA,1,
+#         "roGFP5",-300,-270,1,
+#         "roGFP6",-289,-267,1,
+#         "roGFP1_iE",NA,NA,1,
+#         "roGFP2_iL",NA,NA,1,
+#         "roGFP1_R9",-280,-263,1,
+#         "roGFP1_R12",-266,-250,1,
+#         "roGFP1_R12_empirical",-270,-240,1,
+#         "grx1_roGFP2",-287,-262,1,
+#         "roGFP1",-296,-250,1.5,
+#         "roGFP2",-303,-244,1.5,
+#         "roGFP3",-307,-272,1.5,
+#         "roGFP4",NA,NA,1.5,
+#         "roGFP5",-309,-261,1.5,
+#         "roGFP6",-297,-258,1.5,
+#         "roGFP1_iE",-253,-219,1.5,
+#         "roGFP2_iL",NA,NA,1.5,
+#         "roGFP1_R9",-291,-252,1.5,
+#         "roGFP1_R12",-278,-239,1.5,
+#         "roGFP1_R12_empirical",-279,-231,1.5,
+#         "grx1_roGFP2",-297,-253,1.5,
+#         "roGFP1",-301,-245,2,
+#         "roGFP2",-307,-239,2,
+#         "roGFP3",-312,-267,2,
+#         "roGFP4",-292,-266,2,
+#         "roGFP5",-314,-256,2,
+#         "roGFP6",-302,-253,2,
+#         "roGFP1_iE",-259,-214,2,
+#         "roGFP2_iL",-236,-220,2,
+#         "roGFP1_R9",-296,-247,2,
+#         "roGFP1_R12",-283,-233,2,
+#         "roGFP1_R12_empirical",-284,-227,2,
+#         "grx1_roGFP2",-301,-248,2,
+#         "roGFP1",-304,-241,2.5,
+#         "roGFP2",-312,-236,2.5,
+#         "roGFP3",-316,-263,2.5,
+#         "roGFP4",-296,-261,2.5,
+#         "roGFP5",-317,-253,2.5,
+#         "roGFP6",-302,-248,2.5,
+#         "roGFP1_iE",-263,-210,2.5,
+#         "roGFP2_iL",-242,-213,2.5,
+#         "roGFP1_R9",-300,-243,2.5,
+#         "roGFP1_R12",-287,-230,2.5,
+#         "roGFP1_R12_empirical",-287,-223,2.5,
+#         "grx1_roGFP2",-305,-245,2.5,
+#         "roGFP1",-307,-239,3,
+#         "roGFP2",-312,-234,3,
+#         "roGFP3",-319,-260,3,
+#         "roGFP4",-300,-258,3,
+#         "roGFP5",-320,-251,3,
+#         "roGFP6",-312,-246,3,
+#         "roGFP1_iE",-266,-207,3,
+#         "roGFP2_iL",-245,-211,3,
+#         "roGFP1_R9",-303,-241,3,
+#         "roGFP1_R12",-289,-227,3,
+#         "roGFP1_R12_empirical",-290,-221,3,
+#         "grx1_roGFP2",-308,-242,3)
+# 
+# ggplot() +
+#   geom_linerange(data = ranges %>% arrange(-error_thresh), 
+#                  mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
+#                              lwd = 1, color = error_thresh), size = 10) +
+#   coord_cartesian(ylim = c(-240, -300)) +
+#   scale_color_continuous(high = "lightgreen", low = "forestgreen") +
+#   xlab("")+
+#   ylab("Glutathione Redox Potential (mV)") +
+#   coord_flip()  +
+#   theme_classic() +
+#   theme(aspect.ratio = 1)
+# 
+# 
+# ggplot() +
+#     geom_linerange(data = ranges %>% arrange(-as.numeric(error_thresh)), 
+#                    mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
+#                                lwd = 1, color = error_thresh)) +
+#     scale_color_manual(values = rev(brewer.pal(5,"Greens"))) +
+#     ylab("Redox Potential") +
+#     xlab("") +
+#     scale_y_continuous(breaks= seq(-400,-200,by = 10), 
+#                      labels = insert_minor( seq(-400, -200, by = 50), 4 ), 
+#                      limits = c(-350,-200), expand = c(0,0)) +
+#     coord_flip() 
 
-insert_minor <- function(major_labs, n_minor) {labs <- 
-                              c( sapply( major_labs, function(x) c(x, rep("", 4) ) ) )
-                              labs[1:(length(labs)-n_minor)]}
+```
 
-ggplot() +
-    geom_linerange(data = ranges %>% arrange(-as.numeric(error_thresh)), 
-                   mapping=aes(x = Sensor_Name, ymin = Minimum, ymax = Maximum, 
-                               lwd = 1, color = error_thresh)) +
-    scale_color_manual(values = rev(brewer.pal(5,"Greys"))) +
-    ylab("Redox Potential") +
-    xlab("") +
-    scale_y_continuous(breaks= seq(-400,-200,by = 10), 
-                     labels = insert_minor( seq(-400, -200, by = 50), 4 ), 
-                     limits = c(-350,-200), expand = c(0,0)) +
-    coord_flip()
+```{r}
+for (value in -400:-100) {
+    best_error = Inf
+    best_sensor = ""
+    for (sensorName in sensorList) {
+      sensor <- get(sensorName)
+      sensorName <- str_replace(sensorName, "_sensor", "")
+      error_data <- getErrorTable(sensor, R = getR(sensor, by = 0.001, edgeBy = 100000), 
+                                  FUN = getE, Error_Model = error_model)
+      
+      error_filter <- subset(error_data, 
+                             error_data$FUN_true >= value 
+                             & error_data$FUN_true < value + 1)
+      avg_error <- error_filter$max_abs_error[1]
+      if(is.na(avg_error)) {
+        avg_error <- Inf
+      }
+      
+      if (avg_error < best_error) {
+        best_error <- avg_error
+        best_sensor <- sensorName
+      }
+    }
+    print(paste("Best error at:", value, "is", best_error, "for", best_sensor))
+}
+```
 
+```{r}
+error <- function(x) {return(0.028*x)}
+error_rogfp2 <- getErrorTable(roGFP2_sensor, R = getR(roGFP2_sensor, by = 0.00001, edgeBy = 10), 
+                                  FUN = getE, Error_Model = error)
+error_rogfp3 <- getErrorTable(roGFP3_sensor, R = getR(roGFP3_sensor, by = 0.001, edgeBy = 10), 
+                                  FUN = getE, Error_Model = error)
 
+plot(error_rogfp2$max_abs_error ~ error_rogfp2$FUN_true, cex = 0.1, xlim = c(-350, -200), ylim = c(0,20),
+     ylab = "Error in E_GSH", xlab = "E_GSH")
+points(error_rogfp3$max_abs_error ~ error_rogfp3$FUN_true, cex = 0.1, col = "red")
+legend("topright", c("roGFP2, 2.8%", "roGFP3, 2.8%"), col = c("black", "red"), lty = c(1,1))
+
+error_rogfp2 <- data.frame(E = error_rogfp2$FUN_true, error = error_rogfp2$max_abs_error)
+error_rogfp3 <- data.frame(E = error_rogfp3$FUN_true, error = error_rogfp3$max_abs_error)
+knitr::kable(subset(error_rogfp2, error_rogfp2$E > -330))
+
+error <- function(x) {return(0.01*x)}
+error_rogfp2 <- getErrorTable(roGFP2_sensor, R = getR(roGFP2_sensor, by = 0.00001, edgeBy = 10), 
+                                  FUN = getE, Error_Model = error)
+error_rogfp3 <- getErrorTable(roGFP3_sensor, R = getR(roGFP3_sensor, by = 0.001, edgeBy = 10), 
+                                  FUN = getE, Error_Model = error)
+
+plot(error_rogfp2$max_abs_error ~ error_rogfp2$FUN_true, cex = 0.1, xlim = c(-350, -200), ylim = c(0,2))
+points(error_rogfp3$max_abs_error ~ error_rogfp3$FUN_true, cex = 0.1, col = "red")
+legend("bottomleft", c("roGFP2, 1%", "roGFP3, 1%"), col = c("black", "red"), lty = c(1,1))
 ```
